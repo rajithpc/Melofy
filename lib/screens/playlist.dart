@@ -34,7 +34,13 @@ class _PlaylistState extends State<Playlist> {
         body: Column(
           children: [
             _isAddingPlaylist
-                ? AddPlaylist(onClose: _toggleAddPlaylist)
+                ? AddPlaylist(onClose: () {
+                    _toggleAddPlaylist;
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Playlist()),
+                    );
+                  })
                 : Search(
                     hintValue: 'Search Playlist',
                     onSearch: _filterPlaylists,

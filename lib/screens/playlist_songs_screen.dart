@@ -37,7 +37,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
 
     setState(() {
       _songs = fetchedSongs;
-      _filteredSongs = fetchedSongs; // Initialize the filtered list
+      _filteredSongs = fetchedSongs;
     });
   }
 
@@ -87,7 +87,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                 for (String songPath in selectedSongs) {
                   addSongToPlaylist(widget.playlist.name, songPath);
                 }
-                _fetchSongs(); // Refresh the playlist
+                _fetchSongs();
               }
             },
           ),
@@ -122,6 +122,8 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                               child: QueryArtworkWidget(
                                 id: song.id,
                                 type: ArtworkType.AUDIO,
+                                artworkBorder: BorderRadius.zero,
+                                artworkFit: BoxFit.cover,
                                 nullArtworkWidget: Container(
                                   width: 50,
                                   height: 50,
@@ -135,15 +137,14 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                               ),
                             ),
                             title: Text(
-                              song.title.split('|').first.trim(),
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            subtitle: Text(
-                              song.artist == "<unknown>" || song.artist == null
-                                  ? "Unknown Artist"
-                                  : song.artist!,
-                              style: const TextStyle(color: Colors.grey),
-                            ),
+                                song.title.length > 24
+                                    ? '${song.title.substring(0, 24)}...'
+                                    : song.title,
+                                style: const TextStyle(color: Colors.white)),
+                            subtitle: Text(song.artist ?? "Unknown Artist",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.grey)),
                             trailing: IconButton(
                               onPressed: () {
                                 _removeSongFromPlaylist(song.data);

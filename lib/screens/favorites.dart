@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import '../db_functions/db_crud_functions.dart';
 import '../db_functions/song_model.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
@@ -43,7 +44,6 @@ class _FavoritesState extends State<Favorites> {
                     );
                   }
 
-                  // Initialize favorite songs list
                   _favoriteSongs = box.values.toList().cast<FavoriteSong>();
                   if (_filteredFavorites.isEmpty) {
                     _filteredFavorites = _favoriteSongs;
@@ -93,7 +93,7 @@ class _FavoritesState extends State<Favorites> {
                             ),
                             trailing: GestureDetector(
                               onTap: () {
-                                box.deleteAt(index);
+                                removeFromFavorites(song.id);
                               },
                               child: Image.asset(
                                 'assets/images/favorites.png',

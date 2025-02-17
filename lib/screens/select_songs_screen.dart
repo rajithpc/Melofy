@@ -64,16 +64,33 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
                 bool isSelected = _selectedSongs.contains(song.data);
 
                 return ListTile(
-                  leading: QueryArtworkWidget(
-                    id: song.id,
-                    type: ArtworkType.AUDIO,
-                    artworkBorder: BorderRadius.circular(10),
-                    nullArtworkWidget:
-                        const Icon(Icons.music_note, color: Colors.grey),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: QueryArtworkWidget(
+                      id: song.id,
+                      type: ArtworkType.AUDIO,
+                      artworkBorder: BorderRadius.zero,
+                      artworkFit: BoxFit.cover,
+                      nullArtworkWidget: Container(
+                        width: 50,
+                        height: 50,
+                        color: Colors.grey,
+                        child: const Icon(
+                          Icons.music_note,
+                          size: 30,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ),
                   ),
-                  title: Text(song.title,
+                  title: Text(
+                      song.title.length > 25
+                          ? '${song.title.substring(0, 25)}...'
+                          : song.title,
                       style: const TextStyle(color: Colors.white)),
                   subtitle: Text(song.artist ?? "Unknown Artist",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.grey)),
                   trailing: Checkbox(
                     value: isSelected,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:melofy/screens/all_songs.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'db_functions/song_model.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'db_functions/song_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

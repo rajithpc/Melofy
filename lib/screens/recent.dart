@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melofy/db_functions/song_model.dart';
+import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/search.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import '../db_functions/db_crud_functions.dart';
+import '../services/fetch_song_by_id.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
 
@@ -14,8 +16,25 @@ class Recent extends StatefulWidget {
 }
 
 class _RecentState extends State<Recent> {
+  late Future<List<RecentSongs>> _recentSongsFuture;
   List<RecentSongs> _recentSongs = [];
   List<RecentSongs> _filteredRecentSongs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecentSongs();
+  }
+
+  void _fetchRecentSongs() {
+    _recentSongsFuture = getAllRecentSongs();
+    _recentSongsFuture.then((songs) {
+      setState(() {
+        _recentSongs = songs;
+        _filteredRecentSongs = songs;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,84 +49,45 @@ class _RecentState extends State<Recent> {
             ),
             const ScreenNavigators(screenName: 'Recent'),
             Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: Hive.box<RecentSongs>('Recents').listenable(),
-                builder: (context, Box<RecentSongs> box, _) {
-                  if (box.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No recents added.',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  _recentSongs = box.values.toList().cast<RecentSongs>();
-                  if (_filteredRecentSongs.isEmpty ||
-                      _filteredRecentSongs.length > _recentSongs.length) {
-                    _filteredRecentSongs = _recentSongs;
+              child: FutureBuilder<List<RecentSongs>>(
+                future: _recentSongsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No recent songs found"));
                   }
 
                   return ListView.builder(
                     itemCount: _filteredRecentSongs.length,
                     itemBuilder: (context, index) {
                       final song = _filteredRecentSongs[index];
-                      final songName = song.title.split('|').first.trim();
-                      final artistName = song.artist.split(',').first.trim();
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: QueryArtworkWidget(
-                                id: song.id,
-                                type: ArtworkType.AUDIO,
-                                artworkBorder: BorderRadius.zero,
-                                artworkFit: BoxFit.cover,
-                                nullArtworkWidget: Container(
-                                  width: 50,
-                                  height: 50,
-                                  color: Colors.grey,
-                                  child: const Icon(
-                                    Icons.music_note,
-                                    size: 30,
-                                    color: Colors.blueGrey,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              songName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'melofy-font',
-                              ),
-                            ),
-                            subtitle: Text(
-                              artistName,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'melofy-font',
-                              ),
-                            ),
-                            trailing: GestureDetector(
-                              onTap: () {
-                                box.deleteAt(index);
-                              },
-                              child: const Icon(
-                                Icons.more_vert,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.fromLTRB(70, 0, 20, 0),
-                            child: Divider(
-                              thickness: 0.2,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                      return FutureBuilder<SongModel>(
+                        future: fetchSongById(song.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return ListTile(
+                                title: Text("Error: ${snapshot.error}"));
+                          } else if (!snapshot.hasData) {
+                            return const ListTile(
+                                title: Text("Song not found"));
+                          }
+
+                          SongModel songData = snapshot.data!;
+                          return CommonListItem(
+                            song: songData,
+                            onButtonPressed: () {
+                              removeFromRecents(song.id);
+                            },
+                            isFavorites: false,
+                          );
+                        },
                       );
                     },
                   );

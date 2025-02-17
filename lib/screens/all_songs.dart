@@ -47,10 +47,10 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
         sortType: SongSortType.TITLE,
         orderType: OrderType.ASC_OR_SMALLER,
         ignoreCase: true,
-        uriType: UriType.EXTERNAL, // Ensures external storage files are checked
+        uriType: UriType.EXTERNAL,
       );
 
-      print("Songs fetched: ${songs.length}"); // Debugging line
+      print("Songs fetched: ${songs.length}");
 
       setState(() {
         _songs = songs;

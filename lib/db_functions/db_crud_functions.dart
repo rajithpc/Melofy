@@ -33,6 +33,11 @@ Future<void> removeFromRecents(int songId) async {
   }
 }
 
+Future<List<RecentSongs>> getAllRecentSongs() async {
+  final box = Hive.box<RecentSongs>('Recents');
+  return box.values.toList();
+}
+
 void createPlaylist(String playlistName) {
   var playlistBox = Hive.box<MyPlaylistModel>('playlists');
   playlistBox.put(

@@ -18,18 +18,17 @@ class _AddPlaylistState extends State<AddPlaylist> {
     String playlistName = _playlistController.text.trim();
 
     if (playlistName.isEmpty) {
-      return; // Don't create an empty playlist
+      return;
     }
 
     var playlistBox = Hive.box<MyPlaylistModel>('playlists');
 
-    // Check if the playlist already exists
     if (!playlistBox.containsKey(playlistName)) {
       playlistBox.put(
           playlistName, MyPlaylistModel(name: playlistName, songPaths: []));
     }
 
-    widget.onClose(); // Close the AddPlaylist widget
+    widget.onClose();
   }
 
   @override
@@ -71,7 +70,7 @@ class _AddPlaylistState extends State<AddPlaylist> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: widget.onClose, // Close AddPlaylist on cancel
+                      onPressed: widget.onClose,
                       child: const Text("Cancel",
                           style: TextStyle(color: Colors.red)),
                     ),

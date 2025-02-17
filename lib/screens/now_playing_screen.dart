@@ -27,20 +27,16 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
 
   Future<void> _initializePlayer() async {
     try {
-      // Set the audio source using the song's file path
       await _audioPlayer.setAudioSource(AudioSource.uri(
         Uri.parse(widget.song.data),
         tag: MediaItem(
-          // Specify a unique ID for each media item:
           id: widget.song.id.toString(),
-          // Metadata to display in the notification:
           album: widget.song.album,
           title: widget.song.title,
           artUri: Uri.parse(widget.song.data),
         ),
       ));
 
-      // Get the total duration
       _audioPlayer.durationStream.listen((duration) {
         if (duration != null) {
           setState(() {
@@ -49,14 +45,12 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
         }
       });
 
-      // Listen to the current playback position
       _audioPlayer.positionStream.listen((position) {
         setState(() {
           _currentPosition = position;
         });
       });
 
-      // Play the song immediately
       _audioPlayer.play();
     } catch (e) {
       debugPrint('Error loading audio: $e');
