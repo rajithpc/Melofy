@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:melofy/widgets/common_list_item.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/song_model.dart';
+import '../services/fetch_song_by_id.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
+import 'now_playing_screen.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({super.key});
@@ -53,9 +56,72 @@ class _FavoritesState extends State<Favorites> {
                     itemCount: _filteredFavorites.length,
                     itemBuilder: (context, index) {
                       final song = _filteredFavorites[index];
-                      final songName = song.title.split('|').first.trim();
-                      final artistName = song.artist.split(',').first.trim();
-                      return Column(
+                      return FutureBuilder<SongModel>(
+                          future: fetchSongById(song.id),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return ListTile(
+                                  title: Text("Error: ${snapshot.error}"));
+                            } else if (!snapshot.hasData) {
+                              return const ListTile(
+                                  title: Text("Song not found"));
+                            }
+
+                            SongModel songData = snapshot.data!;
+                            return CommonListItem(
+                                song: songData,
+                                onButtonPressed: () {
+                                  removeFromFavorites(song.id);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Favorites(),
+                                    ),
+                                  );
+                                },
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NowPlayingScreen(
+                                        song: songData,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                isFavorites: true);
+                          });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: const BottomPlay(),
+      ),
+    );
+  }
+
+  void _filterFavorites(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredFavorites = _favoriteSongs;
+      } else {
+        _filteredFavorites = _favoriteSongs
+            .where((song) =>
+                song.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+}
+/*
+Column(
                         children: [
                           ListTile(
                             leading: ClipRRect(
@@ -93,7 +159,7 @@ class _FavoritesState extends State<Favorites> {
                             ),
                             trailing: GestureDetector(
                               onTap: () {
-                                removeFromFavorites(song.id);
+                                
                               },
                               child: Image.asset(
                                 'assets/images/favorites.png',
@@ -110,29 +176,4 @@ class _FavoritesState extends State<Favorites> {
                             ),
                           ),
                         ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: const BottomPlay(),
-      ),
-    );
-  }
-
-  void _filterFavorites(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredFavorites = _favoriteSongs;
-      } else {
-        _filteredFavorites = _favoriteSongs
-            .where((song) =>
-                song.title.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-  }
-}
+                      );*/

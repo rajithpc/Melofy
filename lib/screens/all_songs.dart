@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
 import 'package:melofy/widgets/add_to_db.dart';
 import 'package:melofy/widgets/bottom_play.dart';
+import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/screen_navigators.dart';
 import 'package:melofy/widgets/search.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -111,112 +112,52 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                                       itemCount: _filteredSongs.length,
                                       itemBuilder: (context, index) {
                                         final song = _filteredSongs[index];
-                                        final songName =
-                                            song.title.split('|').first.trim();
-                                        final artistName =
-                                            song.artist == "<unknown>" ||
-                                                    song.artist == null
-                                                ? "Unknown Artist"
-                                                : song.artist!
-                                                    .split(',')
-                                                    .first
-                                                    .trim();
-                                        return Column(
-                                          children: [
-                                            ListTile(
-                                              leading: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                                child: QueryArtworkWidget(
-                                                  id: song.id,
-                                                  type: ArtworkType.AUDIO,
-                                                  artworkBorder:
-                                                      BorderRadius.zero,
-                                                  artworkFit: BoxFit.cover,
-                                                  nullArtworkWidget: Container(
-                                                    width: 50,
-                                                    height: 50,
-                                                    color: Colors.grey,
-                                                    child: const Icon(
-                                                      Icons.music_note,
-                                                      size: 30,
-                                                      color: Colors.blueGrey,
-                                                    ),
+                                        return CommonListItem(
+                                            song: song,
+                                            onButtonPressed: () async {
+                                              final songData = FavoriteSong(
+                                                id: song.id,
+                                                title: song.title,
+                                                artist: song.artist ??
+                                                    "Unknown Artist",
+                                                duration: song.duration ?? 0,
+                                              );
+                                              setState(() {
+                                                favSong = songData;
+                                                _isBottumPlay = false;
+                                              });
+                                            },
+                                            onTap: () async {
+                                              recentSong = RecentSongs(
+                                                id: song.id,
+                                                title: song.title,
+                                                artist: song.artist ??
+                                                    "Unknown Artist",
+                                                duration: song.duration ?? 0,
+                                              );
+                                              addToRecents(recentSong!);
+                                              final songData = {
+                                                'id': song.id,
+                                                'title': song.title,
+                                                'artist': song.artist,
+                                                'duration': song.duration,
+                                              };
+
+                                              await SongPreferenceHelper
+                                                  .saveSong(songData);
+                                              SongNotifier.selectedSong.value =
+                                                  songData;
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      NowPlayingScreen(
+                                                    song: song,
                                                   ),
                                                 ),
-                                              ),
-                                              title: Text(
-                                                songName,
-                                                style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontFamily: 'melofy-font'),
-                                              ),
-                                              subtitle: Text(
-                                                artistName,
-                                                style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontFamily: 'melofy-font'),
-                                              ),
-                                              trailing: IconButton(
-                                                  onPressed: () async {
-                                                    final songData =
-                                                        FavoriteSong(
-                                                      id: song.id,
-                                                      title: song.title,
-                                                      artist: song.artist ??
-                                                          "Unknown Artist",
-                                                      duration:
-                                                          song.duration ?? 0,
-                                                    );
-                                                    setState(() {
-                                                      favSong = songData;
-                                                      _isBottumPlay = false;
-                                                    });
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.more_vert,
-                                                    color: Colors.grey,
-                                                  )),
-                                              onTap: () async {
-                                                recentSong = RecentSongs(
-                                                  id: song.id,
-                                                  title: song.title,
-                                                  artist: song.artist ??
-                                                      "Unknown Artist",
-                                                  duration: song.duration ?? 0,
-                                                );
-                                                addToRecents(recentSong!);
-                                                final songData = {
-                                                  'id': song.id,
-                                                  'title': song.title,
-                                                  'artist': song.artist,
-                                                  'duration': song.duration,
-                                                };
-
-                                                await SongPreferenceHelper
-                                                    .saveSong(songData);
-                                                SongNotifier.selectedSong
-                                                    .value = songData;
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        NowPlayingScreen(
-                                                            song: song),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  70, 0, 20, 0),
-                                              child: Divider(
-                                                thickness: 0.2,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        );
+                                              );
+                                            },
+                                            isFavorites: false);
                                       })
                                   : const Center(
                                       child: Text(

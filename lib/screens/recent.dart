@@ -7,6 +7,7 @@ import '../db_functions/db_crud_functions.dart';
 import '../services/fetch_song_by_id.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
+import 'now_playing_screen.dart';
 
 class Recent extends StatefulWidget {
   const Recent({super.key});
@@ -30,8 +31,8 @@ class _RecentState extends State<Recent> {
     _recentSongsFuture = getAllRecentSongs();
     _recentSongsFuture.then((songs) {
       setState(() {
-        _recentSongs = songs;
-        _filteredRecentSongs = songs;
+        _recentSongs = songs..reversed;
+        _filteredRecentSongs = songs.reversed.toList();
       });
     });
   }
@@ -84,6 +85,22 @@ class _RecentState extends State<Recent> {
                             song: songData,
                             onButtonPressed: () {
                               removeFromRecents(song.id);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Recent(),
+                                ),
+                              );
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NowPlayingScreen(
+                                    song: songData,
+                                  ),
+                                ),
+                              );
                             },
                             isFavorites: false,
                           );
