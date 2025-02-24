@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/db_functions/music_model.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class CommonListItem extends StatelessWidget {
@@ -8,7 +9,7 @@ class CommonListItem extends StatelessWidget {
       required this.onTap,
       required this.isFavorites,
       super.key});
-  final SongModel song;
+  final MusicModel song;
   final VoidCallback onButtonPressed;
   final VoidCallback onTap;
   final bool isFavorites;

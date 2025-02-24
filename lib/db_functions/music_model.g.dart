@@ -1,33 +1,36 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'song_model.dart';
+part of 'music_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class FavoriteSongAdapter extends TypeAdapter<FavoriteSong> {
+class MusicModelAdapter extends TypeAdapter<MusicModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 0;
 
   @override
-  FavoriteSong read(BinaryReader reader) {
+  MusicModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return FavoriteSong(
+    return MusicModel(
       id: fields[0] as int,
       title: fields[1] as String,
-      artist: fields[2] as String,
-      duration: fields[3] as int,
+      artist: fields[2] as String?,
+      path: fields[3] as String,
+      playCount: fields[4] as int,
+      data: fields[5] as String?,
+      album: fields[6] as String?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, FavoriteSong obj) {
+  void write(BinaryWriter writer, MusicModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +38,13 @@ class FavoriteSongAdapter extends TypeAdapter<FavoriteSong> {
       ..writeByte(2)
       ..write(obj.artist)
       ..writeByte(3)
-      ..write(obj.duration);
+      ..write(obj.path)
+      ..writeByte(4)
+      ..write(obj.playCount)
+      ..writeByte(5)
+      ..write(obj.data)
+      ..writeByte(6)
+      ..write(obj.album);
   }
 
   @override
@@ -44,57 +53,14 @@ class FavoriteSongAdapter extends TypeAdapter<FavoriteSong> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FavoriteSongAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class RecentSongsAdapter extends TypeAdapter<RecentSongs> {
-  @override
-  final int typeId = 2;
-
-  @override
-  RecentSongs read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return RecentSongs(
-      id: fields[0] as int,
-      title: fields[1] as String,
-      artist: fields[2] as String,
-      duration: fields[3] as int,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, RecentSongs obj) {
-    writer
-      ..writeByte(4)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.artist)
-      ..writeByte(3)
-      ..write(obj.duration);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RecentSongsAdapter &&
+      other is MusicModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
 class MyPlaylistModelAdapter extends TypeAdapter<MyPlaylistModel> {
   @override
-  final int typeId = 3;
+  final int typeId = 1;
 
   @override
   MyPlaylistModel read(BinaryReader reader) {
@@ -103,19 +69,22 @@ class MyPlaylistModelAdapter extends TypeAdapter<MyPlaylistModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MyPlaylistModel(
-      name: fields[0] as String,
-      songPaths: (fields[1] as List).cast<String>(),
+      playlistId: fields[0] as int,
+      name: fields[1] as String,
+      songs: (fields[2] as List).cast<MusicModel>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, MyPlaylistModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.playlistId)
       ..writeByte(1)
-      ..write(obj.songPaths);
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.songs);
   }
 
   @override

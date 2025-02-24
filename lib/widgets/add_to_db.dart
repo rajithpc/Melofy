@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../db_functions/song_model.dart';
+import '../db_functions/music_model.dart';
 
 class AddToDb extends StatelessWidget {
   const AddToDb({required this.song, required this.onClose, Key? key})
       : super(key: key);
-  final FavoriteSong song;
+  final MusicModel song;
   final VoidCallback onClose;
 
   @override
@@ -37,8 +37,8 @@ class AddToDb extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () async {
-                  await addToFavorites(song);
+                onTap: () {
+                  HiveDatabase.addMusic('favoritesBox', song);
                   onClose();
                 },
                 child: const Text(

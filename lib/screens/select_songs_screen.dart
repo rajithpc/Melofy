@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/db_functions/db_crud_functions.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import '../db_functions/music_model.dart';
 
 class SelectSongsScreen extends StatefulWidget {
   final String playlistName;
@@ -11,9 +13,8 @@ class SelectSongsScreen extends StatefulWidget {
 }
 
 class _SelectSongsScreenState extends State<SelectSongsScreen> {
-  final OnAudioQuery _audioQuery = OnAudioQuery();
-  List<SongModel> _allSongs = [];
-  List<String> _selectedSongs = [];
+  List<MusicModel> _allSongs = [];
+  List<MusicModel> _selectedSongs = [];
 
   @override
   void initState() {
@@ -22,10 +23,7 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
   }
 
   Future<void> _fetchSongs() async {
-    List<SongModel> fetchedSongs = await _audioQuery.querySongs(
-      orderType: OrderType.ASC_OR_SMALLER,
-      uriType: UriType.EXTERNAL,
-    );
+    List<MusicModel> fetchedSongs = HiveDatabase.getAllMusic('musicBox');
 
     setState(() {
       _allSongs = fetchedSongs;
@@ -54,14 +52,16 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
       backgroundColor: Colors.grey[900],
       body: _allSongs.isEmpty
           ? const Center(
-              child:
-                  Text("No Songs Found", style: TextStyle(color: Colors.grey)),
+              child: Text(
+                "No Songs Found",
+                style: TextStyle(color: Colors.grey),
+              ),
             )
           : ListView.builder(
               itemCount: _allSongs.length,
               itemBuilder: (context, index) {
                 final song = _allSongs[index];
-                bool isSelected = _selectedSongs.contains(song.data);
+                bool isSelected = _selectedSongs.contains(song);
 
                 return ListTile(
                   leading: ClipRRect(
@@ -84,22 +84,25 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
                     ),
                   ),
                   title: Text(
-                      song.title.length > 25
-                          ? '${song.title.substring(0, 25)}...'
-                          : song.title,
-                      style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(song.artist ?? "Unknown Artist",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.grey)),
+                    song.title.length > 25
+                        ? '${song.title.substring(0, 25)}...'
+                        : song.title,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    song.artist ?? "Unknown Artist",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
                   trailing: Checkbox(
                     value: isSelected,
                     onChanged: (bool? value) {
                       setState(() {
                         if (value == true) {
-                          _selectedSongs.add(song.data);
+                          _selectedSongs.add(song);
                         } else {
-                          _selectedSongs.remove(song.data);
+                          _selectedSongs.remove(song);
                         }
                       });
                     },
@@ -107,9 +110,9 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
                   onTap: () {
                     setState(() {
                       if (isSelected) {
-                        _selectedSongs.remove(song.data);
+                        _selectedSongs.remove(song);
                       } else {
-                        _selectedSongs.add(song.data);
+                        _selectedSongs.add(song);
                       }
                     });
                   },

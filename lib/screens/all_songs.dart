@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
+import 'package:melofy/screens/now_playing_screen.dart';
 import 'package:melofy/widgets/add_to_db.dart';
 import 'package:melofy/widgets/bottom_play.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/screen_navigators.dart';
 import 'package:melofy/widgets/search.dart';
-import 'package:on_audio_query/on_audio_query.dart';
-import 'package:permission_handler/permission_handler.dart';
-import '../db_functions/song_model.dart';
+import '../db_functions/music_model.dart';
 import '../utilities/shared_preference_helper.dart';
-import '../utilities/song_notifier.dart';
-import 'now_playing_screen.dart';
 
 class AllSongsScreen extends StatefulWidget {
   @override
@@ -18,72 +16,22 @@ class AllSongsScreen extends StatefulWidget {
 }
 
 class _AllSongsScreenState extends State<AllSongsScreen> {
-  final OnAudioQuery _audioQuery = OnAudioQuery();
-  List<SongModel> _songs = [];
-  List<SongModel> _filteredSongs = [];
-  bool _permissionGranted = false;
+  List<MusicModel> _songs = [];
+  MusicModel? favSong;
+  List<MusicModel> _filteredSongs = [];
   bool _isBottumPlay = true;
-  FavoriteSong? favSong;
-  RecentSongs? recentSong;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
-    _checkAndFetchSongs();
+    fetchSongs();
   }
 
-  Future<bool> requestStoragePermission() async {
-    var status = await Permission.storage.request();
-    if (status.isGranted) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  Future<void> _checkAndFetchSongs() async {
-    _permissionGranted = await requestStoragePermission();
-    if (_permissionGranted) {
-      List<SongModel> songs = await _audioQuery.querySongs(
-        sortType: SongSortType.TITLE,
-        orderType: OrderType.ASC_OR_SMALLER,
-        ignoreCase: true,
-        uriType: UriType.EXTERNAL,
-      );
-
-      print("Songs fetched: ${songs.length}");
-
-      setState(() {
-        _songs = songs;
-        _filteredSongs = songs;
-      });
-    }
-  }
-
-  void _refreshSongList() async {
-    List<SongModel> songs = await _audioQuery.querySongs(
-      sortType: SongSortType.TITLE,
-      orderType: OrderType.ASC_OR_SMALLER,
-      ignoreCase: true,
-      uriType: UriType.EXTERNAL,
-    );
-
+  void fetchSongs() {
     setState(() {
-      _songs = songs;
-      _filteredSongs = songs;
-    });
-  }
-
-  void _filterSongs(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredSongs = _songs;
-      } else {
-        _filteredSongs = _songs
-            .where((song) =>
-                song.title.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
+      _songs = HiveDatabase.getAllMusic('musicBox');
+      _filteredSongs = _songs;
     });
   }
 
@@ -98,82 +46,49 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                 hintValue: 'Search Music',
                 onSearch: _filterSongs,
               ),
-              const Column(
-                children: [ScreenNavigators(screenName: 'All Songs')],
-              ),
-              Column(
-                children: [
-                  _permissionGranted
-                      ? _songs.isNotEmpty
-                          ? SizedBox(
-                              height: 514,
-                              child: _filteredSongs.isNotEmpty
-                                  ? ListView.builder(
-                                      itemCount: _filteredSongs.length,
-                                      itemBuilder: (context, index) {
-                                        final song = _filteredSongs[index];
-                                        return CommonListItem(
-                                            song: song,
-                                            onButtonPressed: () async {
-                                              final songData = FavoriteSong(
-                                                id: song.id,
-                                                title: song.title,
-                                                artist: song.artist ??
-                                                    "Unknown Artist",
-                                                duration: song.duration ?? 0,
-                                              );
-                                              setState(() {
-                                                favSong = songData;
-                                                _isBottumPlay = false;
-                                              });
-                                            },
-                                            onTap: () async {
-                                              recentSong = RecentSongs(
-                                                id: song.id,
-                                                title: song.title,
-                                                artist: song.artist ??
-                                                    "Unknown Artist",
-                                                duration: song.duration ?? 0,
-                                              );
-                                              addToRecents(recentSong!);
-                                              final songData = {
-                                                'id': song.id,
-                                                'title': song.title,
-                                                'artist': song.artist,
-                                                'duration': song.duration,
-                                              };
-
-                                              await SongPreferenceHelper
-                                                  .saveSong(songData);
-                                              SongNotifier.selectedSong.value =
-                                                  songData;
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      NowPlayingScreen(
-                                                    song: song,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            isFavorites: false);
-                                      })
-                                  : const Center(
-                                      child: Text(
-                                        "No songs found",
-                                        style: TextStyle(
-                                            color: Colors.grey, fontSize: 16),
-                                      ),
-                                    ))
-                          : const Center(child: Text("No audio files found"))
-                      : const Center(child: Text("Permission not granted")),
-                ],
-              )
+              const ScreenNavigators(screenName: 'All Songs'),
+              Expanded(
+                  child: _songs.isNotEmpty
+                      ? _filteredSongs.isNotEmpty
+                          ? ListView.builder(
+                              itemCount: _filteredSongs.length,
+                              itemBuilder: (context, index) {
+                                final song = _filteredSongs[index];
+                                return CommonListItem(
+                                    song: song,
+                                    onButtonPressed: () {
+                                      setState(() {
+                                        favSong = song;
+                                        _isBottumPlay = false;
+                                      });
+                                    },
+                                    onTap: () {
+                                      HiveDatabase.addMusic(
+                                          'recentlyPlayedBox', song);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                NowPlayingScreen(song: song)),
+                                      );
+                                      setState(() async {
+                                        MusicIdStorage.saveMusicId(song.id);
+                                      });
+                                    },
+                                    isFavorites: false);
+                              })
+                          : const Center(
+                              child: Text(
+                                "No songs found",
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 16),
+                              ),
+                            )
+                      : const Center(child: Text("No audio files found")))
             ],
           ),
           bottomNavigationBar: _isBottumPlay
-              ? const BottomPlay()
+              ? BottomPlay()
               : AddToDb(
                   song: favSong!,
                   onClose: () {
@@ -183,5 +98,18 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                   },
                 )),
     );
+  }
+
+  void _filterSongs(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredSongs = _songs;
+      } else {
+        _filteredSongs = _songs
+            .where((song) =>
+                song.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 }

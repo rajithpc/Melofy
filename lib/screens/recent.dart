@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:melofy/db_functions/song_model.dart';
+import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/search.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../services/fetch_song_by_id.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
 import 'now_playing_screen.dart';
@@ -17,23 +15,19 @@ class Recent extends StatefulWidget {
 }
 
 class _RecentState extends State<Recent> {
-  late Future<List<RecentSongs>> _recentSongsFuture;
-  List<RecentSongs> _recentSongs = [];
-  List<RecentSongs> _filteredRecentSongs = [];
+  List<MusicModel> _recentSongs = [];
+  List<MusicModel> _filteredRecentSongs = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchRecentSongs();
+    fetchSongs();
   }
 
-  void _fetchRecentSongs() {
-    _recentSongsFuture = getAllRecentSongs();
-    _recentSongsFuture.then((songs) {
-      setState(() {
-        _recentSongs = songs..reversed;
-        _filteredRecentSongs = songs.reversed.toList();
-      });
+  void fetchSongs() {
+    setState(() {
+      _recentSongs = HiveDatabase.getAllMusic('recentlyPlayedBox');
+      _filteredRecentSongs = _recentSongs..reversed;
     });
   }
 
@@ -50,70 +44,45 @@ class _RecentState extends State<Recent> {
             ),
             const ScreenNavigators(screenName: 'Recent'),
             Expanded(
-              child: FutureBuilder<List<RecentSongs>>(
-                future: _recentSongsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}"));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No recent songs found"));
-                  }
-
-                  return ListView.builder(
-                    itemCount: _filteredRecentSongs.length,
-                    itemBuilder: (context, index) {
-                      final song = _filteredRecentSongs[index];
-                      return FutureBuilder<SongModel>(
-                        future: fetchSongById(song.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return ListTile(
-                                title: Text("Error: ${snapshot.error}"));
-                          } else if (!snapshot.hasData) {
-                            return const ListTile(
-                                title: Text("Song not found"));
-                          }
-
-                          SongModel songData = snapshot.data!;
+                child: _filteredRecentSongs.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: _filteredRecentSongs.length,
+                        itemBuilder: (context, index) {
+                          final song = _filteredRecentSongs[index];
                           return CommonListItem(
-                            song: songData,
-                            onButtonPressed: () {
-                              removeFromRecents(song.id);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Recent(),
-                                ),
-                              );
-                            },
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NowPlayingScreen(
-                                    song: songData,
+                              song: song,
+                              onButtonPressed: () {
+                                HiveDatabase.deleteMusic(
+                                    'recentlyPlayedBox', song.id);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Recent(),
+                                    ));
+                              },
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NowPlayingScreen(
+                                      song: song,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            isFavorites: false,
-                          );
+                                );
+                              },
+                              isFavorites: false);
                         },
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+                      )
+                    : const Center(
+                        child: Text(
+                          'No Recently Played Songs',
+                          style: TextStyle(
+                              color: Colors.grey, fontFamily: 'melofy-font'),
+                        ),
+                      )),
           ],
         ),
-        bottomNavigationBar: const BottomPlay(),
+        bottomNavigationBar: BottomPlay(),
       ),
     );
   }

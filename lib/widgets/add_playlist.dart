@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../db_functions/song_model.dart';
+import 'package:melofy/db_functions/db_crud_functions.dart';
+import 'package:melofy/db_functions/music_model.dart';
 
 class AddPlaylist extends StatefulWidget {
-  final VoidCallback onClose; // Callback to close the widget
+  final VoidCallback onClose;
 
   const AddPlaylist({super.key, required this.onClose});
 
@@ -16,17 +16,7 @@ class _AddPlaylistState extends State<AddPlaylist> {
 
   void _createPlaylist() {
     String playlistName = _playlistController.text.trim();
-
-    if (playlistName.isEmpty) {
-      return;
-    }
-
-    var playlistBox = Hive.box<MyPlaylistModel>('playlists');
-
-    if (!playlistBox.containsKey(playlistName)) {
-      playlistBox.put(
-          playlistName, MyPlaylistModel(name: playlistName, songPaths: []));
-    }
+    HiveDatabase.addPlaylist(playlistName);
 
     widget.onClose();
   }
@@ -74,11 +64,10 @@ class _AddPlaylistState extends State<AddPlaylist> {
                       child: const Text("Cancel",
                           style: TextStyle(color: Colors.red)),
                     ),
-                    ElevatedButton(
+                    TextButton(
                       onPressed: _createPlaylist,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
-                      child: const Text("Add"),
+                      child: const Text("Add",
+                          style: TextStyle(color: Colors.green)),
                     ),
                   ],
                 ),

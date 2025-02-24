@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melofy/widgets/common_list_item.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../db_functions/song_model.dart';
-import '../services/fetch_song_by_id.dart';
+import '../db_functions/music_model.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
@@ -18,8 +15,21 @@ class Favorites extends StatefulWidget {
 }
 
 class _FavoritesState extends State<Favorites> {
-  List<FavoriteSong> _favoriteSongs = [];
-  List<FavoriteSong> _filteredFavorites = [];
+  List<MusicModel> _favoriteSongs = [];
+  List<MusicModel> _filteredFavorites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSongs();
+  }
+
+  void fetchSongs() {
+    setState(() {
+      _favoriteSongs = HiveDatabase.getAllMusic('favoritesBox');
+      _filteredFavorites = _favoriteSongs..reversed;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,75 +44,45 @@ class _FavoritesState extends State<Favorites> {
             ),
             const ScreenNavigators(screenName: 'Favorites'),
             Expanded(
-              child: ValueListenableBuilder(
-                valueListenable:
-                    Hive.box<FavoriteSong>('favorites').listenable(),
-                builder: (context, Box<FavoriteSong> box, _) {
-                  if (box.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No favorites added.',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  _favoriteSongs = box.values.toList().cast<FavoriteSong>();
-                  if (_filteredFavorites.isEmpty) {
-                    _filteredFavorites = _favoriteSongs;
-                  }
-
-                  return ListView.builder(
-                    itemCount: _filteredFavorites.length,
-                    itemBuilder: (context, index) {
-                      final song = _filteredFavorites[index];
-                      return FutureBuilder<SongModel>(
-                          future: fetchSongById(song.id),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return ListTile(
-                                  title: Text("Error: ${snapshot.error}"));
-                            } else if (!snapshot.hasData) {
-                              return const ListTile(
-                                  title: Text("Song not found"));
-                            }
-
-                            SongModel songData = snapshot.data!;
-                            return CommonListItem(
-                                song: songData,
-                                onButtonPressed: () {
-                                  removeFromFavorites(song.id);
-                                  Navigator.push(
+                child: _filteredFavorites.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: _filteredFavorites.length,
+                        itemBuilder: (context, index) {
+                          final song = _filteredFavorites[index];
+                          return CommonListItem(
+                              song: song,
+                              onButtonPressed: () {
+                                HiveDatabase.deleteMusic(
+                                    'favoritesBox', song.id);
+                                Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => const Favorites(),
+                                    ));
+                              },
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NowPlayingScreen(
+                                      song: song,
                                     ),
-                                  );
-                                },
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => NowPlayingScreen(
-                                        song: songData,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                isFavorites: true);
-                          });
-                    },
-                  );
-                },
-              ),
-            ),
+                                  ),
+                                );
+                              },
+                              isFavorites: true);
+                        },
+                      )
+                    : const Center(
+                        child: Text(
+                          'No Favorite Songs',
+                          style: TextStyle(
+                              color: Colors.grey, fontFamily: 'melofy-font'),
+                        ),
+                      )),
           ],
         ),
-        bottomNavigationBar: const BottomPlay(),
+        bottomNavigationBar: BottomPlay(),
       ),
     );
   }
@@ -120,60 +100,3 @@ class _FavoritesState extends State<Favorites> {
     });
   }
 }
-/*
-Column(
-                        children: [
-                          ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: QueryArtworkWidget(
-                                id: song.id,
-                                type: ArtworkType.AUDIO,
-                                artworkBorder: BorderRadius.zero,
-                                artworkFit: BoxFit.cover,
-                                nullArtworkWidget: Container(
-                                  width: 50,
-                                  height: 50,
-                                  color: Colors.grey,
-                                  child: const Icon(
-                                    Icons.music_note,
-                                    size: 30,
-                                    color: Colors.blueGrey,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              songName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'melofy-font',
-                              ),
-                            ),
-                            subtitle: Text(
-                              artistName,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'melofy-font',
-                              ),
-                            ),
-                            trailing: GestureDetector(
-                              onTap: () {
-                                
-                              },
-                              child: Image.asset(
-                                'assets/images/favorites.png',
-                                width: 30,
-                                height: 30,
-                              ),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.fromLTRB(70, 0, 20, 0),
-                            child: Divider(
-                              thickness: 0.2,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      );*/

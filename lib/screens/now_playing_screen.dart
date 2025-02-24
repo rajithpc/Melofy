@@ -2,10 +2,11 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
+import 'package:melofy/db_functions/music_model.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class NowPlayingScreen extends StatefulWidget {
-  final SongModel song;
+  final MusicModel song;
 
   const NowPlayingScreen({required this.song, Key? key}) : super(key: key);
 
@@ -28,12 +29,12 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
   Future<void> _initializePlayer() async {
     try {
       await _audioPlayer.setAudioSource(AudioSource.uri(
-        Uri.parse(widget.song.data),
+        Uri.parse(widget.song.data!),
         tag: MediaItem(
           id: widget.song.id.toString(),
           album: widget.song.album,
           title: widget.song.title,
-          artUri: Uri.parse(widget.song.data),
+          artUri: Uri.parse(widget.song.data!),
         ),
       ));
 
