@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
-import 'package:melofy/db_functions/music_model.dart';
 
 class AddPlaylist extends StatefulWidget {
   final VoidCallback onClose;

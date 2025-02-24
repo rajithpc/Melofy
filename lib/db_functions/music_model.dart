@@ -1,6 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:on_audio_query/on_audio_query.dart';
-
 part 'music_model.g.dart';
 
 @HiveType(typeId: 0)
