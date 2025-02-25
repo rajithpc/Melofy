@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/screens/select_playlist.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
 
@@ -22,12 +23,23 @@ class AddToDb extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const Text(
-                'Add to Playlist',
-                style: TextStyle(
-                    fontFamily: 'melofy-font',
-                    color: Colors.grey,
-                    fontSize: 20),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SelectPlaylistScreen(song: song),
+                    ),
+                  );
+                  onClose();
+                },
+                child: const Text(
+                  'Add to Playlist',
+                  style: TextStyle(
+                      fontFamily: 'melofy-font',
+                      color: Colors.grey,
+                      fontSize: 20),
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(20, 10, 20, 10),

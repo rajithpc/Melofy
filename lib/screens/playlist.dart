@@ -62,56 +62,56 @@ class _PlaylistState extends State<Playlist> {
               onAddPlaylistPressed: _toggleAddPlaylist,
             ),
             Expanded(
-                child: _filteredPlaylists.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: _filteredPlaylists.length,
-                        itemBuilder: (context, index) {
-                          MyPlaylistModel playlist = _filteredPlaylists[index];
+              child: _filteredPlaylists.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _filteredPlaylists.length,
+                      itemBuilder: (context, index) {
+                        MyPlaylistModel playlist = _filteredPlaylists[index];
 
-                          return ListTile(
-                            title: Text(
-                              playlist.name,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            subtitle: Text(
-                              '${playlist.songs.length} songs',
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                HiveDatabase.deletePlaylist(
-                                    playlist.playlistId);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const Playlist(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            onTap: () {
+                        return ListTile(
+                          title: Text(
+                            playlist.name,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            '${playlist.songs.length} songs',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          trailing: IconButton(
+                            onPressed: () {
+                              HiveDatabase.deletePlaylist(playlist.playlistId);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      PlaylistSongsScreen(playlist: playlist),
+                                  builder: (context) => const Playlist(),
                                 ),
                               );
                             },
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Text(
-                          'No Playlist Found',
-                          style: TextStyle(
-                              color: Colors.grey, fontFamily: 'melofy-font'),
-                        ),
-                      )),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PlaylistSongsScreen(playlist: playlist),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )
+                  : const Center(
+                      child: Text(
+                        'No Playlist Found',
+                        style: TextStyle(
+                            color: Colors.grey, fontFamily: 'melofy-font'),
+                      ),
+                    ),
+            ),
           ],
         ),
         bottomNavigationBar: BottomPlay(),
