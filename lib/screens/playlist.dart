@@ -6,7 +6,6 @@ import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
 import '../db_functions/music_model.dart';
 import '../widgets/add_playlist.dart';
-import 'playlist_songs_screen.dart';
 
 class Playlist extends StatefulWidget {
   const Playlist({super.key});

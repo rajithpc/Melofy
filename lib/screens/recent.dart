@@ -61,14 +61,15 @@ class _RecentState extends State<Recent> {
                                     ));
                               },
                               onTap: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => NowPlayingScreen(
-                                //       song: song,
-                                //     ),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NowPlayingScreen(
+                                      songs: _recentSongs,
+                                      currentIndex: index,
+                                    ),
+                                  ),
+                                );
                               },
                               isFavorites: false);
                         },

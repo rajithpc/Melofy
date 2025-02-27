@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:marquee/marquee.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/music_model.dart'; // Import Hive if needed
 import 'dart:typed_data'; // For Uint8List
