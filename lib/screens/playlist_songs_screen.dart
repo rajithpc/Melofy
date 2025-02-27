@@ -111,13 +111,13 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                             );
                           },
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    NowPlayingScreen(song: song),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) =>
+                            //         NowPlayingScreen(song: song),
+                            //   ),
+                            // );
                           },
                           isFavorites: false);
                     },

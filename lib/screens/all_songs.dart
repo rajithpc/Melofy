@@ -69,7 +69,10 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                NowPlayingScreen(song: song)),
+                                                NowPlayingScreen(
+                                                  songs: _songs,
+                                                  currentIndex: index,
+                                                )),
                                       );
                                       setState(() async {
                                         MusicIdStorage.saveMusicId(song.id);

@@ -1,83 +1,142 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:marquee/marquee.dart';
-import 'package:melofy/db_functions/music_model.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import '../db_functions/music_model.dart'; // Import Hive if needed
+import 'dart:typed_data'; // For Uint8List
 
 class NowPlayingScreen extends StatefulWidget {
-  final MusicModel song;
+  final List<MusicModel> songs; // List of MusicModel objects
+  final int currentIndex; // Current song index
 
-  const NowPlayingScreen({required this.song, Key? key}) : super(key: key);
+  const NowPlayingScreen({
+    Key? key,
+    required this.songs,
+    required this.currentIndex,
+  }) : super(key: key);
 
   @override
   _NowPlayingScreenState createState() => _NowPlayingScreenState();
 }
 
 class _NowPlayingScreenState extends State<NowPlayingScreen> {
-  late AudioPlayer _audioPlayer;
-  Duration _currentPosition = Duration.zero;
-  Duration _totalDuration = Duration.zero;
+  late AudioPlayer audioPlayer;
+  bool isPlaying = false;
+  int currentIndex = 0;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  Future<Uint8List?>? _artworkFuture; // Future to cache artwork
 
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
-    _initializePlayer();
+    audioPlayer = AudioPlayer();
+    currentIndex = widget.currentIndex;
+    _artworkFuture =
+        _getArtwork(widget.songs[currentIndex].id); // Fetch artwork
+    _playSong(widget.songs[currentIndex].path);
+
+    // Listen to audio player events
+    audioPlayer.onDurationChanged.listen((Duration duration) {
+      setState(() {
+        _duration = duration;
+      });
+    });
+
+    audioPlayer.onPositionChanged.listen((Duration position) {
+      setState(() {
+        _position = position;
+      });
+    });
+
+    audioPlayer.onPlayerComplete.listen((event) {
+      setState(() {
+        isPlaying = false;
+        _position = Duration.zero;
+      });
+    });
   }
 
-  Future<void> _initializePlayer() async {
-    try {
-      await _audioPlayer.setAudioSource(AudioSource.uri(
-        Uri.parse(widget.song.data!),
-        tag: MediaItem(
-          id: widget.song.id.toString(),
-          album: widget.song.album,
-          title: widget.song.title,
-          artUri: Uri.parse(widget.song.data!),
-        ),
-      ));
+  Future<Uint8List?> _getArtwork(int id) async {
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    return await audioQuery.queryArtwork(id, ArtworkType.AUDIO);
+  }
 
-      _audioPlayer.durationStream.listen((duration) {
-        if (duration != null) {
-          setState(() {
-            _totalDuration = duration;
-          });
-        }
+  void _playSong(String songPath) async {
+    await audioPlayer.play(DeviceFileSource(songPath));
+    setState(() {
+      isPlaying = true;
+    });
+  }
+
+  void _pauseSong() async {
+    await audioPlayer.pause();
+    setState(() {
+      isPlaying = false;
+    });
+  }
+
+  void _playNextSong() {
+    if (currentIndex < widget.songs.length - 1) {
+      currentIndex++;
+      setState(() {
+        _artworkFuture =
+            _getArtwork(widget.songs[currentIndex].id); // Update artwork
       });
-
-      _audioPlayer.positionStream.listen((position) {
-        setState(() {
-          _currentPosition = position;
-        });
-      });
-
-      _audioPlayer.play();
-    } catch (e) {
-      debugPrint('Error loading audio: $e');
+      _playSong(widget.songs[currentIndex].path);
     }
+  }
+
+  void _playPreviousSong() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      setState(() {
+        _artworkFuture =
+            _getArtwork(widget.songs[currentIndex].id); // Update artwork
+      });
+      _playSong(widget.songs[currentIndex].path);
+    }
+  }
+
+  void _seekToPosition(Duration position) async {
+    await audioPlayer.seek(position);
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return [
+      if (duration.inHours > 0) hours,
+      minutes,
+      seconds,
+    ].join(':');
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final songName = widget.song.title.split('|').first.trim();
+    MusicModel currentSong = widget.songs[currentIndex];
+    final songName = currentSong.title.split('|').first.trim();
     final artistName =
-        (widget.song.artist == "<unknown>" || widget.song.artist == null)
+        (currentSong.artist == "<unknown>" || currentSong.artist == null)
             ? "Unknown Artist"
-            : widget.song.artist!.split(',').first.trim();
+            : currentSong.artist!.split(',').first.trim();
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[900],
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Header Section
+            // Song name and artist
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -92,64 +151,6 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  songName.length < 25
-                      ? Column(
-                          children: [
-                            Text(
-                              songName,
-                              style: const TextStyle(
-                                fontFamily: 'melofy-font',
-                                color: Colors.grey,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              artistName,
-                              style: const TextStyle(
-                                fontFamily: 'melofy-font',
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        )
-                      : Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 30,
-                                child: Marquee(
-                                  text: songName,
-                                  style: const TextStyle(
-                                    fontFamily: 'melofy-font',
-                                    color: Colors.grey,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  scrollAxis: Axis.horizontal,
-                                  blankSpace: 50.0,
-                                  velocity: 30.0,
-                                  pauseAfterRound: const Duration(seconds: 2),
-                                  startPadding: 10.0,
-                                  accelerationDuration:
-                                      const Duration(seconds: 1),
-                                  decelerationDuration:
-                                      const Duration(seconds: 1),
-                                ),
-                              ),
-                              Text(
-                                artistName,
-                                style: const TextStyle(
-                                  fontFamily: 'melofy-font',
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(
@@ -162,120 +163,161 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
               ),
             ),
 
-            const SizedBox(height: 100),
-
-            // Song Artwork
-            QueryArtworkWidget(
-              artworkWidth: 300,
-              artworkHeight: 300,
-              artworkQuality: FilterQuality.high,
-              id: widget.song.id,
-              type: ArtworkType.AUDIO,
-              artworkFit: BoxFit.cover,
-              artworkBorder: BorderRadius.circular(10),
-              nullArtworkWidget: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.music_note,
-                  color: Colors.grey,
-                  size: 100,
-                ),
-              ),
+            // Artwork
+            FutureBuilder<Uint8List?>(
+              future: _artworkFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.music_note,
+                      color: Colors.grey,
+                      size: 100,
+                    ),
+                  );
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(
+                      snapshot.data!,
+                      width: 300,
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                } else {
+                  return Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.music_note,
+                      color: Colors.grey,
+                      size: 100,
+                    ),
+                  );
+                }
+              },
             ),
-
             const Spacer(),
 
-            // Duration Slider
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  Slider(
-                    value: _currentPosition.inSeconds.toDouble(),
-                    onChanged: (value) {
-                      _audioPlayer.seek(Duration(seconds: value.toInt()));
-                    },
-                    min: 0,
-                    max: _totalDuration.inSeconds.toDouble(),
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.grey,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            songName.length < 25
+                ? Column(
                     children: [
                       Text(
-                        _formatDuration(_currentPosition),
-                        style: const TextStyle(color: Colors.grey),
+                        songName,
+                        style: const TextStyle(
+                          fontFamily: 'melofy-font',
+                          color: Colors.grey,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
-                        _formatDuration(_totalDuration),
-                        style: const TextStyle(color: Colors.grey),
+                        artistName,
+                        style: const TextStyle(
+                          fontFamily: 'melofy-font',
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
+                  )
+                : Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 30,
+                          child: Text(
+                            songName,
+                            style: const TextStyle(
+                              fontFamily: 'melofy-font',
+                              color: Colors.grey,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          artistName,
+                          style: const TextStyle(
+                            fontFamily: 'melofy-font',
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+            const Spacer(),
+            // Progress slider
+            Slider(
+              min: 0,
+              max: _duration.inSeconds.toDouble(),
+              value: _position.inSeconds.toDouble(),
+              onChanged: (value) {
+                _seekToPosition(Duration(seconds: value.toInt()));
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _formatDuration(_position),
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  Text(_formatDuration(_duration),
+                      style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
-
-            const Spacer(),
-
-            // Playback Controls
+            const SizedBox(height: 20),
+            // Playback controls
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
-                  onPressed: () {},
                   icon: const Icon(
                     Icons.skip_previous,
-                    color: Colors.grey,
                     size: 40,
+                    color: Colors.grey,
                   ),
-                ),
-                CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.grey[800],
-                  child: IconButton(
-                    onPressed: () {
-                      if (_audioPlayer.playing) {
-                        _audioPlayer.pause();
-                      } else {
-                        _audioPlayer.play();
-                      }
-                    },
-                    icon: Icon(
-                      _audioPlayer.playing ? Icons.pause : Icons.play_arrow,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
+                  onPressed: _playPreviousSong,
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.skip_next,
-                    color: Colors.grey,
-                    size: 40,
-                  ),
+                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
+                      size: 40, color: Colors.grey),
+                  onPressed: () {
+                    if (isPlaying) {
+                      _pauseSong();
+                    } else {
+                      _playSong(currentSong.path);
+                    }
+                  },
+                ),
+                IconButton(
+                  icon:
+                      const Icon(Icons.skip_next, size: 40, color: Colors.grey),
+                  onPressed: _playNextSong,
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes);
-    final seconds = twoDigits(duration.inSeconds % 60);
-    return "$minutes:$seconds";
   }
 }

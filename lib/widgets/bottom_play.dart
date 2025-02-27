@@ -29,13 +29,13 @@ class BottomPlay extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            NowPlayingScreen(song: selectedMusic!),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) =>
+                    //         NowPlayingScreen(song: selectedMusic!),
+                    //   ),
+                    // );
                   },
                   child: ListTile(
                     leading: ClipRRect(

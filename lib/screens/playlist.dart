@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/widgets/playlist_item.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
@@ -61,57 +62,32 @@ class _PlaylistState extends State<Playlist> {
               screenName: 'Playlist',
               onAddPlaylistPressed: _toggleAddPlaylist,
             ),
-            Expanded(
-              child: _filteredPlaylists.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: _filteredPlaylists.length,
-                      itemBuilder: (context, index) {
-                        MyPlaylistModel playlist = _filteredPlaylists[index];
-
-                        return ListTile(
-                          title: Text(
-                            playlist.name,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text(
-                            '${playlist.songs.length} songs',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () {
-                              HiveDatabase.deletePlaylist(playlist.playlistId);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Playlist(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PlaylistSongsScreen(playlist: playlist),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: Text(
-                        'No Playlist Found',
-                        style: TextStyle(
-                            color: Colors.grey, fontFamily: 'melofy-font'),
-                      ),
+            _filteredPlaylists.isNotEmpty
+                ? Expanded(
+                    child: GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                        children:
+                            List.generate(_filteredPlaylists.length, (index) {
+                          return PlaylistItem(
+                              playlistName: _filteredPlaylists[index].name,
+                              songCount: _filteredPlaylists[index].songs.length,
+                              artworkId:
+                                  _filteredPlaylists[index].songs.isNotEmpty
+                                      ? _filteredPlaylists[index].songs[0].id
+                                      : 0,
+                              onEdit: () {},
+                              onDelete: () {});
+                        })),
+                  )
+                : const Center(
+                    child: Text(
+                      'No Playlist Found',
+                      style: TextStyle(
+                          color: Colors.grey, fontFamily: 'melofy-font'),
                     ),
-            ),
+                  ),
           ],
         ),
         bottomNavigationBar: BottomPlay(),
