@@ -4,9 +4,9 @@ import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/music_model.dart';
 
 class SelectSongsScreen extends StatefulWidget {
-  final String playlistName;
+  final MyPlaylistModel playlist;
 
-  const SelectSongsScreen({super.key, required this.playlistName});
+  const SelectSongsScreen({super.key, required this.playlist});
 
   @override
   _SelectSongsScreenState createState() => _SelectSongsScreenState();
@@ -27,6 +27,7 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
 
     setState(() {
       _allSongs = fetchedSongs;
+      _selectedSongs = List.from(widget.playlist.songs);
     });
   }
 
@@ -61,7 +62,7 @@ class _SelectSongsScreenState extends State<SelectSongsScreen> {
               itemCount: _allSongs.length,
               itemBuilder: (context, index) {
                 final song = _allSongs[index];
-                bool isSelected = _selectedSongs.contains(song);
+                bool isSelected = _selectedSongs.any((s) => s.id == song.id);
 
                 return ListTile(
                   leading: ClipRRect(

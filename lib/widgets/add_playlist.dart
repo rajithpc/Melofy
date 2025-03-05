@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
+import 'package:melofy/db_functions/music_model.dart';
 
 class AddPlaylist extends StatefulWidget {
   final VoidCallback onClose;
+  final MyPlaylistModel? playlist;
 
-  const AddPlaylist({super.key, required this.onClose});
+  const AddPlaylist({super.key, required this.playlist, required this.onClose});
 
   @override
   _AddPlaylistState createState() => _AddPlaylistState();
@@ -16,6 +18,15 @@ class _AddPlaylistState extends State<AddPlaylist> {
   void _createPlaylist() {
     String playlistName = _playlistController.text.trim();
     HiveDatabase.addPlaylist(playlistName);
+    widget.onClose();
+  }
+
+  void _updatePlaylist() {
+    MyPlaylistModel tempPlaylist = MyPlaylistModel(
+        name: _playlistController.text.trim(),
+        playlistId: widget.playlist!.playlistId,
+        songs: widget.playlist!.songs);
+    HiveDatabase.updatePlaylist(tempPlaylist);
 
     widget.onClose();
   }
@@ -64,10 +75,14 @@ class _AddPlaylistState extends State<AddPlaylist> {
                           style: TextStyle(color: Colors.red)),
                     ),
                     TextButton(
-                      onPressed: _createPlaylist,
-                      child: const Text("Add",
-                          style: TextStyle(color: Colors.green)),
-                    ),
+                        onPressed: widget.playlist == null
+                            ? _createPlaylist
+                            : _updatePlaylist,
+                        child: widget.playlist == null
+                            ? const Text("Add",
+                                style: TextStyle(color: Colors.green))
+                            : const Text("Update",
+                                style: TextStyle(color: Colors.green))),
                   ],
                 ),
               ],

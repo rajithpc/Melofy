@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/screens/now_playing_screen.dart';
+import 'package:melofy/screens/playlist.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import '../db_functions/db_crud_functions.dart';
+import '../widgets/delete_confirmation.dart';
 import '../widgets/search.dart';
 import 'select_songs_screen.dart';
 
@@ -61,11 +63,13 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      SelectSongsScreen(playlistName: widget.playlist.name),
+                      SelectSongsScreen(playlist: widget.playlist),
                 ),
               );
 
               if (selectedSongs.isNotEmpty) {
+                HiveDatabase.removeMultipleSongsFromPlaylist(
+                    widget.playlist.playlistId, widget.playlist.songs);
                 HiveDatabase.addMultipleSongsToPlaylist(
                     widget.playlist.playlistId, selectedSongs);
                 setState(() {
@@ -75,6 +79,16 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
             },
           ),
         ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Playlist(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.arrow_back)),
       ),
       backgroundColor: Colors.grey[900],
       body: Column(
@@ -100,13 +114,21 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                       return CommonListItem(
                           song: song,
                           onButtonPressed: () {
-                            HiveDatabase.removeMusicFromPlaylist(
-                                widget.playlist.playlistId, song);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlaylistSongsScreen(
-                                    playlist: widget.playlist),
+                            showDialog(
+                              context: context,
+                              builder: (context) => DeleteConfirmationDialog(
+                                title: "Delete Playlist",
+                                content: "Are you sure you want to delete ?",
+                                onConfirm: () {
+                                  HiveDatabase.removeMusicFromPlaylist(
+                                      widget.playlist.playlistId, song);
+                                  setState(() {
+                                    _songs.removeWhere(
+                                        (item) => item.id == song.id);
+                                    _filteredSongs.removeWhere(
+                                        (item) => item.id == song.id);
+                                  });
+                                },
                               ),
                             );
                           },
@@ -121,7 +143,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                               ),
                             );
                           },
-                          isFavorites: false);
+                          screenType: ScreenType.playlistSongs);
                     },
                   ),
           ),

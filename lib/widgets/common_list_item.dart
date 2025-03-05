@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/music_model.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'bottom_sheet.dart';
+
+enum ScreenType { allSongs, recents, favorites, playlistSongs }
 
 class CommonListItem extends StatelessWidget {
   const CommonListItem(
       {required this.song,
       required this.onButtonPressed,
       required this.onTap,
-      required this.isFavorites,
+      required this.screenType,
       super.key});
   final MusicModel song;
   final VoidCallback onButtonPressed;
   final VoidCallback onTap;
-  final bool isFavorites;
+  final ScreenType screenType;
 
   @override
   Widget build(BuildContext context) {
@@ -53,16 +56,25 @@ class CommonListItem extends StatelessWidget {
             fontFamily: 'melofy-font',
           ),
         ),
-        trailing: GestureDetector(
-          onTap: onButtonPressed,
-          child: !isFavorites
-              ? const Icon(Icons.more_vert)
-              : Image.asset(
-                  'assets/images/favorites.png',
-                  width: 30,
-                  height: 30,
+        trailing: screenType.index == 0 || screenType.index == 1
+            ? BottomSheetAddToDB(song: song)
+            : ElevatedButton(
+                onPressed: onButtonPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
                 ),
-        ),
+                child: screenType.index == 2
+                    ? const Icon(
+                        Icons.favorite,
+                        color: Colors.grey,
+                      )
+                    : const Icon(
+                        Icons.more_vert,
+                        color: Colors.grey,
+                      ),
+              ),
         onTap: onTap,
       ),
       const Padding(

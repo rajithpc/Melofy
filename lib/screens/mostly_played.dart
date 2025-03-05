@@ -7,16 +7,16 @@ import '../widgets/delete_confirmation.dart';
 import '../widgets/screen_navigators.dart';
 import 'now_playing_screen.dart';
 
-class Recent extends StatefulWidget {
-  const Recent({super.key});
+class MostlyPlayed extends StatefulWidget {
+  const MostlyPlayed({super.key});
 
   @override
-  _RecentState createState() => _RecentState();
+  _MostlyPlayedState createState() => _MostlyPlayedState();
 }
 
-class _RecentState extends State<Recent> {
-  List<MusicModel> _recentSongs = [];
-  List<MusicModel> _filteredRecentSongs = [];
+class _MostlyPlayedState extends State<MostlyPlayed> {
+  List<MusicModel> _mostlyPlayedSongs = [];
+  List<MusicModel> _filteredMostlyPlayedSongs = [];
   int currentIndex = 0;
 
   @override
@@ -27,8 +27,9 @@ class _RecentState extends State<Recent> {
 
   void fetchSongs() {
     setState(() {
-      _recentSongs = HiveDatabase.getAllMusic('recentlyPlayedBox');
-      _filteredRecentSongs = _recentSongs..reversed;
+      _mostlyPlayedSongs = HiveDatabase.getAllMusic('mostlyPlayedBox');
+      _mostlyPlayedSongs.sort((a, b) => b.playCount.compareTo(a.playCount));
+      _filteredMostlyPlayedSongs = _mostlyPlayedSongs;
     });
   }
 
@@ -41,44 +42,24 @@ class _RecentState extends State<Recent> {
           children: [
             Search(
               hintValue: 'Search Music',
-              onSearch: _filterRecentSongs,
+              onSearch: _filterMostlyPlayedSongs,
             ),
-            const ScreenNavigators(screenName: 'Recent'),
+            const ScreenNavigators(screenName: 'Mostly played songs'),
             Expanded(
-                child: _filteredRecentSongs.isNotEmpty
+                child: _filteredMostlyPlayedSongs.isNotEmpty
                     ? ListView.builder(
-                        itemCount: _filteredRecentSongs.length,
+                        itemCount: _filteredMostlyPlayedSongs.length,
                         itemBuilder: (context, index) {
-                          final song = _filteredRecentSongs[index];
+                          final song = _filteredMostlyPlayedSongs[index];
                           return CommonListItem(
                               song: song,
-                              onButtonPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) =>
-                                      DeleteConfirmationDialog(
-                                    title: "Delete from recents",
-                                    content:
-                                        "Are you sure you want to delete ?",
-                                    onConfirm: () {
-                                      HiveDatabase.deleteMusic(
-                                          'recentlyPlayedBox', song.id);
-                                      setState(() {
-                                        _recentSongs.removeWhere(
-                                            (item) => item.id == song.id);
-                                        _filteredRecentSongs.removeWhere(
-                                            (item) => item.id == song.id);
-                                      });
-                                    },
-                                  ),
-                                );
-                              },
+                              onButtonPressed: () {},
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => NowPlayingScreen(
-                                      songs: _recentSongs,
+                                      songs: _mostlyPlayedSongs,
                                       currentIndex: index,
                                     ),
                                   ),
@@ -89,7 +70,7 @@ class _RecentState extends State<Recent> {
                       )
                     : const Center(
                         child: Text(
-                          'No Recently Played Songs',
+                          'No Mostly Played Songs',
                           style: TextStyle(
                               color: Colors.grey, fontFamily: 'melofy-font'),
                         ),
@@ -100,12 +81,12 @@ class _RecentState extends State<Recent> {
     );
   }
 
-  void _filterRecentSongs(String query) {
+  void _filterMostlyPlayedSongs(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredRecentSongs = _recentSongs;
+        _filteredMostlyPlayedSongs = _mostlyPlayedSongs;
       } else {
-        _filteredRecentSongs = _recentSongs
+        _filteredMostlyPlayedSongs = _mostlyPlayedSongs
             .where((song) =>
                 song.title.toLowerCase().contains(query.toLowerCase()))
             .toList();

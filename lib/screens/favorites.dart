@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
-import '../widgets/bottom_play.dart';
+import '../utilities/snackbar_message.dart';
+import '../widgets/delete_confirmation.dart';
 import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
 import 'now_playing_screen.dart';
@@ -17,6 +18,7 @@ class Favorites extends StatefulWidget {
 class _FavoritesState extends State<Favorites> {
   List<MusicModel> _favoriteSongs = [];
   List<MusicModel> _filteredFavorites = [];
+  int currentIndex = 0;
 
   @override
   void initState() {
@@ -50,28 +52,41 @@ class _FavoritesState extends State<Favorites> {
                         itemBuilder: (context, index) {
                           final song = _filteredFavorites[index];
                           return CommonListItem(
-                              song: song,
-                              onButtonPressed: () {
-                                HiveDatabase.deleteMusic(
-                                    'favoritesBox', song.id);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const Favorites(),
-                                    ));
-                              },
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NowPlayingScreen(
-                                      songs: _favoriteSongs,
-                                      currentIndex: index,
-                                    ),
+                            song: song,
+                            onButtonPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => DeleteConfirmationDialog(
+                                  title: "Delete from Favorites",
+                                  content: "Are you sure you want to delete ?",
+                                  onConfirm: () {
+                                    HiveDatabase.deleteMusic(
+                                        'favoritesBox', song.id);
+                                    SnackbarMessage.showSnackbar(
+                                        context, 'Song removed from favorites');
+                                    setState(() {
+                                      _favoriteSongs.removeWhere(
+                                          (item) => item.id == song.id);
+                                      _filteredFavorites.removeWhere(
+                                          (item) => item.id == song.id);
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NowPlayingScreen(
+                                    songs: _favoriteSongs,
+                                    currentIndex: index,
                                   ),
-                                );
-                              },
-                              isFavorites: true);
+                                ),
+                              );
+                            },
+                            screenType: ScreenType.favorites,
+                          );
                         },
                       )
                     : const Center(
@@ -83,7 +98,6 @@ class _FavoritesState extends State<Favorites> {
                       )),
           ],
         ),
-        bottomNavigationBar: BottomPlay(),
       ),
     );
   }

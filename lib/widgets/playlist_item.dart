@@ -7,15 +7,17 @@ class PlaylistItem extends StatelessWidget {
   final int artworkId;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onTap;
 
-  const PlaylistItem({
-    Key? key,
-    required this.playlistName,
-    required this.songCount,
-    required this.artworkId,
-    required this.onEdit,
-    required this.onDelete,
-  }) : super(key: key);
+  const PlaylistItem(
+      {Key? key,
+      required this.playlistName,
+      required this.songCount,
+      required this.artworkId,
+      required this.onEdit,
+      required this.onDelete,
+      required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,28 +31,29 @@ class PlaylistItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Image at the top
-          ClipRRect(
-            child: QueryArtworkWidget(
-              id: artworkId,
-              type: ArtworkType.AUDIO,
-              artworkWidth: 100,
-              artworkHeight: 100,
-              artworkFit: BoxFit.cover,
-              nullArtworkWidget: Container(
-                width: 100,
-                height: 100,
-                color: Colors.grey.shade800,
-                child:
-                    const Icon(Icons.music_note, color: Colors.grey, size: 50),
+          GestureDetector(
+            onTap: onTap,
+            child: ClipRRect(
+              child: QueryArtworkWidget(
+                id: artworkId,
+                type: ArtworkType.AUDIO,
+                artworkWidth: 100,
+                artworkHeight: 100,
+                artworkFit: BoxFit.cover,
+                nullArtworkWidget: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey.shade800,
+                  child: const Icon(Icons.music_note,
+                      color: Colors.grey, size: 50),
+                ),
               ),
             ),
           ),
 
-          // Playlist Name & Song Count + Edit/Delete Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Playlist Name & Song Count on the right
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -72,17 +75,21 @@ class PlaylistItem extends StatelessWidget {
                   ),
                 ],
               ),
-              // Edit & Delete buttons on the left
-              const Column(
+              Column(
                 children: [
-                  Icon(
-                    Icons.edit,
-                    color: Colors.grey,
+                  GestureDetector(
+                    onTap: onEdit,
+                    child: const Icon(
+                      Icons.edit,
+                      color: Colors.grey,
+                    ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.delete, color: Colors.grey)
+                  GestureDetector(
+                      onTap: onDelete,
+                      child: const Icon(Icons.delete, color: Colors.grey))
                 ],
               ),
             ],

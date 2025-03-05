@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/screens/playlist_songs_screen.dart';
+import 'package:melofy/widgets/delete_confirmation.dart';
 import 'package:melofy/widgets/playlist_item.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../widgets/bottom_play.dart';
 import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
 import '../db_functions/music_model.dart';
@@ -15,17 +16,19 @@ class Playlist extends StatefulWidget {
 }
 
 class _PlaylistState extends State<Playlist> {
+  final TextEditingController _playlistController = TextEditingController();
   bool _isAddingPlaylist = false;
   List<MyPlaylistModel> _playlists = [];
   List<MyPlaylistModel> _filteredPlaylists = [];
+  MyPlaylistModel? _selectedPlaylist;
 
   @override
   void initState() {
     super.initState();
-    fetchSongs();
+    fetchPlaylist();
   }
 
-  void fetchSongs() {
+  void fetchPlaylist() {
     setState(() {
       _playlists = HiveDatabase.getAllPlaylists();
       _filteredPlaylists = _playlists..reversed;
@@ -46,20 +49,26 @@ class _PlaylistState extends State<Playlist> {
         body: Column(
           children: [
             _isAddingPlaylist
-                ? AddPlaylist(onClose: () {
-                    _toggleAddPlaylist;
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Playlist()),
-                    );
-                  })
+                ? AddPlaylist(
+                    playlist: _selectedPlaylist,
+                    onClose: () {
+                      _toggleAddPlaylist;
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Playlist()),
+                      );
+                    })
                 : Search(
                     hintValue: 'Search Playlist',
                     onSearch: _filterPlaylists,
                   ),
             ScreenNavigators(
               screenName: 'Playlist',
-              onAddPlaylistPressed: _toggleAddPlaylist,
+              onAddPlaylistPressed: () {
+                _selectedPlaylist = null;
+                _toggleAddPlaylist();
+              },
             ),
             _filteredPlaylists.isNotEmpty
                 ? Expanded(
@@ -76,8 +85,45 @@ class _PlaylistState extends State<Playlist> {
                                   _filteredPlaylists[index].songs.isNotEmpty
                                       ? _filteredPlaylists[index].songs[0].id
                                       : 0,
-                              onEdit: () {},
-                              onDelete: () {});
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PlaylistSongsScreen(
+                                          playlist: _filteredPlaylists[index])),
+                                );
+                              },
+                              onEdit: () {
+                                _selectedPlaylist = _filteredPlaylists[index];
+                                _playlistController.text =
+                                    _selectedPlaylist!.name;
+                                _toggleAddPlaylist();
+                              },
+                              onDelete: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      DeleteConfirmationDialog(
+                                    title: "Delete Playlist",
+                                    content:
+                                        "Are you sure you want to delete ?",
+                                    onConfirm: () {
+                                      HiveDatabase.deletePlaylist(
+                                          _filteredPlaylists[index].playlistId);
+                                      setState(() {
+                                        _playlists.removeWhere((item) =>
+                                            item.playlistId ==
+                                            _filteredPlaylists[index]
+                                                .playlistId);
+                                        _filteredPlaylists.removeWhere((item) =>
+                                            item.playlistId ==
+                                            _filteredPlaylists[index]
+                                                .playlistId);
+                                      });
+                                    },
+                                  ),
+                                );
+                              });
                         })),
                   )
                 : const Center(
@@ -89,7 +135,8 @@ class _PlaylistState extends State<Playlist> {
                   ),
           ],
         ),
-        bottomNavigationBar: BottomPlay(),
+        // bottomNavigationBar: BottomPlay(songs(),
+        //   currentIndex: currentIndex,),
       ),
     );
   }

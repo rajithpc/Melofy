@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/music_model.dart';
+import 'package:melofy/widgets/add_playlist.dart';
 import '../db_functions/db_crud_functions.dart';
+import '../utilities/snackbar_message.dart';
 import '../widgets/search.dart';
 
 class SelectPlaylistScreen extends StatefulWidget {
-  const SelectPlaylistScreen({required this.song, Key? key}) : super(key: key);
+  const SelectPlaylistScreen(
+      {required this.song, required this.onClose, Key? key})
+      : super(key: key);
 
   final MusicModel song;
+  final VoidCallback onClose;
 
   @override
   State<SelectPlaylistScreen> createState() => _SelectPlaylistScreenState();
@@ -15,6 +20,7 @@ class SelectPlaylistScreen extends StatefulWidget {
 class _SelectPlaylistScreenState extends State<SelectPlaylistScreen> {
   List<MyPlaylistModel> playlists = [];
   List<MyPlaylistModel> _filteredPlaylists = [];
+  bool addToPlaylistEnabled = false;
 
   @override
   void initState() {
@@ -31,9 +37,7 @@ class _SelectPlaylistScreenState extends State<SelectPlaylistScreen> {
 
   void _addSongToPlaylist(int playlistId) {
     HiveDatabase.addMusicToPlaylist(playlistId, widget.song);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Song added to playlist')),
-    );
+    SnackbarMessage.showSnackbar(context, 'Song added to playlist');
     _fetchPlaylists();
   }
 
@@ -76,6 +80,7 @@ class _SelectPlaylistScreenState extends State<SelectPlaylistScreen> {
                               _addSongToPlaylist(
                                   _filteredPlaylists[index].playlistId);
                               Navigator.pop(context);
+                              widget.onClose;
                             },
                           );
                         },
@@ -89,6 +94,25 @@ class _SelectPlaylistScreenState extends State<SelectPlaylistScreen> {
                       )),
           ],
         ),
+        bottomNavigationBar: addToPlaylistEnabled
+            ? AddPlaylist(
+                playlist: null,
+                onClose: () {
+                  addToPlaylistEnabled = false;
+                  _fetchPlaylists();
+                  _filterPlaylists;
+                })
+            : IconButton(
+                onPressed: () {
+                  setState(() {
+                    addToPlaylistEnabled = true;
+                  });
+                },
+                icon: const Icon(
+                  Icons.add,
+                  size: 50,
+                  color: Colors.grey,
+                )),
       ),
     );
   }
