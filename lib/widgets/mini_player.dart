@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:melofy/screens/now_playing_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 

@@ -3,7 +3,6 @@ import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/search.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../widgets/delete_confirmation.dart';
 import '../widgets/screen_navigators.dart';
 import 'now_playing_screen.dart';
 

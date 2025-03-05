@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
 import 'package:melofy/screens/now_playing_screen.dart';
-import 'package:melofy/widgets/add_to_db.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/screen_navigators.dart';
 import 'package:melofy/widgets/search.dart';
@@ -15,7 +14,6 @@ class AllSongsScreen extends StatefulWidget {
 
 class _AllSongsScreenState extends State<AllSongsScreen> {
   List<MusicModel> _songs = [];
-  MusicModel? _selectedSong;
   List<MusicModel> _filteredSongs = [];
 
   @override
@@ -52,11 +50,7 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                               final song = _filteredSongs[index];
                               return CommonListItem(
                                 song: song,
-                                onButtonPressed: () {
-                                  setState(() {
-                                    _selectedSong = song;
-                                  });
-                                },
+                                onButtonPressed: () {},
                                 onTap: () {
                                   HiveDatabase.addMusic(
                                       'recentlyPlayedBox', song);
