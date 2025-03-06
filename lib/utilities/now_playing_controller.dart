@@ -5,9 +5,18 @@ import 'package:melofy/db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
 
 class NowPlayingController {
-  final List<MusicModel> songs;
-  int currentIndex;
-  final Function updateUI;
+  static final NowPlayingController _instance =
+      NowPlayingController._internal();
+
+  factory NowPlayingController() => _instance;
+
+  NowPlayingController._internal() {
+    audioPlayer = AudioPlayer();
+  }
+
+  late List<MusicModel> songs;
+  late int currentIndex;
+  late Function updateUI;
   ValueNotifier<Duration> positionNotifier = ValueNotifier(Duration.zero);
   late AudioPlayer audioPlayer;
   bool isPlaying = false;
@@ -16,17 +25,14 @@ class NowPlayingController {
   bool shuffleEnabled = false;
   bool repeatEnabled = false;
 
-  NowPlayingController(
-    this.songs,
-    this.currentIndex,
-    this.updateUI,
-  ) {
-    audioPlayer = AudioPlayer();
-  }
-
   MusicModel get currentSong => songs[currentIndex];
 
-  void initialize() {
+  void initialize(List<MusicModel> songsList, int index, Function uiUpdater) {
+    songs = songsList;
+    currentIndex = index;
+    updateUI = uiUpdater;
+    playSong(songs[currentIndex].path);
+
     playSong(currentSong.path);
     audioPlayer.onDurationChanged.listen((d) {
       duration = d;

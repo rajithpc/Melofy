@@ -1,46 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:provider/provider.dart';
-
+import '../screens/now_playing_screen.dart';
 import '../utilities/now_playing_controller.dart';
+import 'package:marquee/marquee.dart';
 
-class MiniPlayer extends StatelessWidget {
+class MiniPlayer extends StatefulWidget {
+  @override
+  State<MiniPlayer> createState() => _MiniPlayerState();
+}
+
+class _MiniPlayerState extends State<MiniPlayer> {
+  final nowPlayingController = NowPlayingController();
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<NowPlayingController>(
-      builder: (context, controller, child) {
-        if (controller.songs.isEmpty) {
-          return SizedBox.shrink(); // Hide mini player if no songs
-        }
-
-        final song = controller.currentSong; // Ensure we have a valid song
-
-        return GestureDetector(
-          onTap: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) =>
-            //           NowPlayingScreen(controller: controller)),
-            // );
-          },
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NowPlayingScreen(
+                      songs: nowPlayingController.songs,
+                      currentIndex: nowPlayingController.currentIndex,
+                    )),
+          );
+        },
+        child: SizedBox(
+          height: 100,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[900],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-            ),
+            color: Colors.black,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                const SizedBox(width: 10),
                 QueryArtworkWidget(
-                  id: song.id,
+                  id: nowPlayingController.currentSong.id,
                   type: ArtworkType.AUDIO,
-                  artworkBorder: BorderRadius.circular(8),
+                  artworkBorder: BorderRadius.circular(5),
                   nullArtworkWidget: const Icon(Icons.music_note,
-                      size: 40, color: Colors.grey),
+                      size: 50, color: Colors.grey),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -48,13 +51,54 @@ class MiniPlayer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(song.title,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis),
-                      Text(song.artist ?? "Unknown Artist",
+                      nowPlayingController.currentSong.artist!
+                                  .split('|')
+                                  .first
+                                  .trim()
+                                  .length >
+                              20
+                          ? SizedBox(
+                              height: 25,
+                              child: Expanded(
+                                child: Marquee(
+                                  text: nowPlayingController.currentSong.title
+                                      .split('|')
+                                      .first
+                                      .trim(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                  scrollAxis: Axis.horizontal,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  blankSpace: 30.0, // Space between loops
+                                  velocity: 30.0, // Speed of scrolling
+                                  pauseAfterRound: const Duration(
+                                      seconds: 1), // Pause between loops
+                                  startPadding: 0.0,
+                                  accelerationDuration:
+                                      const Duration(seconds: 1),
+                                  accelerationCurve: Curves.easeIn,
+                                  decelerationDuration:
+                                      const Duration(milliseconds: 500),
+                                  decelerationCurve: Curves.easeOut,
+                                ),
+                              ),
+                            )
+                          : Text(nowPlayingController.currentSong.title
+                              .split('|')
+                              .first
+                              .trim()),
+                      Text(
+                          nowPlayingController.currentSong.artist ==
+                                      "<unknown>" ||
+                                  nowPlayingController.currentSong.artist ==
+                                      null
+                              ? "Unknown Artist"
+                              : nowPlayingController.currentSong.artist!
+                                  .split(',')
+                                  .first
+                                  .trim(),
                           style:
                               const TextStyle(color: Colors.grey, fontSize: 14),
                           overflow: TextOverflow.ellipsis),
@@ -62,23 +106,35 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(
-                      controller.isPlaying
-                          ? Icons.pause_circle_filled
-                          : Icons.play_circle_filled,
-                      color: Colors.white,
-                      size: 35),
-                  onPressed: controller.togglePlayPause,
-                ),
+                    icon: const Icon(Icons.skip_previous,
+                        color: Colors.white, size: 35),
+                    onPressed: () {
+                      nowPlayingController.playPreviousSong();
+                      setState(() {});
+                    }),
+                IconButton(
+                    icon: Icon(
+                        nowPlayingController.isPlaying
+                            ? Icons.play_circle_filled
+                            : Icons.pause_circle_filled,
+                        color: Colors.white,
+                        size: 35),
+                    onPressed: () {
+                      nowPlayingController.togglePlayPause();
+                      setState(() {});
+                    }),
                 IconButton(
                     icon: const Icon(Icons.skip_next,
                         color: Colors.white, size: 35),
-                    onPressed: controller.playNextSong),
+                    onPressed: () {
+                      nowPlayingController.playNextSong();
+                      setState(() {});
+                    }),
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

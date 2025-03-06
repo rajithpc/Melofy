@@ -21,20 +21,19 @@ class NowPlayingScreen extends StatefulWidget {
 }
 
 class _NowPlayingScreenState extends State<NowPlayingScreen> {
-  late NowPlayingController controller;
   bool isAddToDB = true;
+  final nowPlayingController = NowPlayingController();
 
   @override
   void initState() {
     super.initState();
-    controller = NowPlayingController(
-      widget.songs,
-      widget.currentIndex,
-      () {
-        setState(() {});
-      },
-    );
-    controller.initialize();
+    initController();
+  }
+
+  void initController() {
+    nowPlayingController.initialize(widget.songs, widget.currentIndex, () {
+      setState(() {});
+    });
   }
 
   @override
@@ -46,10 +45,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildTopBar(context),
-            ArtworkWidget(controller: controller),
+            ArtworkWidget(controller: nowPlayingController),
             _buildSongDetails(),
-            ProgressBarWidget(controller: controller),
-            PlaybackControls(controller: controller),
+            ProgressBarWidget(controller: nowPlayingController),
+            PlaybackControls(controller: nowPlayingController),
           ],
         ),
       ),
@@ -68,7 +67,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           BottomSheetAddToDB(
-            song: controller.currentSong,
+            song: nowPlayingController.currentSong,
           ),
         ],
       ),
@@ -76,7 +75,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
   }
 
   Widget _buildSongDetails() {
-    final song = controller.currentSong;
+    final song = nowPlayingController.currentSong;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(

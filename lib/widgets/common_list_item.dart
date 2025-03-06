@@ -41,8 +41,8 @@ class CommonListItem extends StatelessWidget {
           ),
         ),
         title: Text(
-          song.title.length > 30
-              ? '${song.title.substring(0, 30)}...'
+          song.title.length > 20
+              ? '${song.title.substring(0, 20)}...'
               : song.title,
           style: const TextStyle(
             color: Colors.white,
@@ -50,7 +50,9 @@ class CommonListItem extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          song.artist!,
+          song.artist == "<unknown>" || song.artist == null
+              ? "Unknown Artist"
+              : song.artist!.split(',').first.trim(),
           style: const TextStyle(
             color: Colors.grey,
             fontFamily: 'melofy-font',
