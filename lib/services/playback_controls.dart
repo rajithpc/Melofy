@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:melofy/utilities/favorite_widget.dart';
 
 import '../utilities/now_playing_controller.dart';
 
@@ -14,40 +15,46 @@ class PlaybackControls extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-            icon: Icon(
-              Icons.repeat_one,
-              size: 40,
-              color: controller.repeatEnabled ? Colors.green : Colors.grey,
-            ),
-            onPressed: controller.repeatSongModeChage),
+            icon: controller.repeatEnabled
+                ? const Icon(
+                    Icons.repeat_one_rounded,
+                    size: 25,
+                    color: Colors.green,
+                  )
+                : controller.shuffleEnabled
+                    ? const Icon(
+                        Icons.shuffle,
+                        size: 25,
+                        color: Colors.green,
+                      )
+                    : const Icon(
+                        Icons.repeat,
+                        size: 25,
+                        color: Colors.green,
+                      ),
+            onPressed: controller.toggleValues),
         IconButton(
             icon: const Icon(
-              Icons.skip_previous,
-              size: 40,
-              color: Colors.grey,
+              Icons.skip_previous_rounded,
+              size: 30,
+              color: Colors.white,
             ),
             onPressed: controller.playPreviousSong),
         IconButton(
             icon: Icon(
-              controller.isPlaying ? Icons.pause : Icons.play_arrow,
-              size: 40,
-              color: Colors.grey,
+              controller.isPlaying ? Icons.pause_circle : Icons.play_circle,
+              size: 70,
+              color: Colors.white,
             ),
             onPressed: controller.togglePlayPause),
         IconButton(
             icon: const Icon(
-              Icons.skip_next,
-              size: 40,
-              color: Colors.grey,
+              Icons.skip_next_rounded,
+              size: 30,
+              color: Colors.white,
             ),
             onPressed: controller.playNextSong),
-        IconButton(
-            icon: Icon(
-              Icons.shuffle_outlined,
-              size: 40,
-              color: controller.shuffleEnabled ? Colors.green : Colors.grey,
-            ),
-            onPressed: controller.shuffleModeChage),
+        FavoriteWidget(song: controller.currentSong),
       ],
     );
   }

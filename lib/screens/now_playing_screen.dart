@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import '../db_functions/music_model.dart';
 import '../services/playback_controls.dart';
@@ -41,14 +43,29 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Stack(
           children: [
-            _buildTopBar(context),
-            ArtworkWidget(controller: nowPlayingController),
-            _buildSongDetails(),
-            ProgressBarWidget(controller: nowPlayingController),
-            PlaybackControls(controller: nowPlayingController),
+            Positioned.fill(
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                child: Image.asset(
+                  "assets/images/emptyImage.jpg",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildTopBar(context),
+                  _buildSongDetails(),
+                  ArtworkWidget(controller: nowPlayingController),
+                  ProgressBarWidget(controller: nowPlayingController),
+                  PlaybackControls(controller: nowPlayingController),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -56,48 +73,42 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
   }
 
   Widget _buildTopBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.keyboard_arrow_down_sharp,
-                size: 40, color: Colors.grey),
-            onPressed: () => Navigator.pop(context),
-          ),
-          BottomSheetAddToDB(
-            song: nowPlayingController.currentSong,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.keyboard_arrow_down_sharp,
+              size: 40, color: Colors.grey),
+          onPressed: () => Navigator.pop(context),
+        ),
+        BottomSheetAddToDB(
+          song: nowPlayingController.currentSong,
+        ),
+      ],
     );
   }
 
   Widget _buildSongDetails() {
     final song = nowPlayingController.currentSong;
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Text(
-            song.title.split('|').first.trim(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontFamily: 'melofy-font',
-                color: Colors.grey,
-                fontSize: 20,
-                fontWeight: FontWeight.bold),
-          ),
-          Text(
-            song.artist == "<unknown>" || song.artist == null
-                ? "Unknown Artist"
-                : song.artist!.split(',').first.trim(),
-            style: const TextStyle(
-                fontFamily: 'melofy-font', fontSize: 16, color: Colors.grey),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        Text(
+          song.title.split('|').first.trim(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              fontFamily: 'melofy-font',
+              color: Colors.grey,
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
+        ),
+        Text(
+          song.artist == "<unknown>" || song.artist == null
+              ? "Unknown Artist"
+              : song.artist!.split(',').first.trim(),
+          style: const TextStyle(
+              fontFamily: 'melofy-font', fontSize: 16, color: Colors.grey),
+        ),
+      ],
     );
   }
 }

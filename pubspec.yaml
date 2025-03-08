@@ -79,6 +79,8 @@ flutter:
     - assets/images/add_to_favourite.png
     - assets/images/all_songs.png
     - assets/images/favorites.png
+    - assets/images/mostly-played.png
+    - assets/images/emptyImage.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

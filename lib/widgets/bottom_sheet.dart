@@ -22,8 +22,6 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
 
   @override
   Widget build(BuildContext context) {
-    List<MusicModel> favoriteSongs = HiveDatabase.getAllMusic('favoritesBox');
-
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,

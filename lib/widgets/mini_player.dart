@@ -51,7 +51,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      nowPlayingController.currentSong.artist!
+                      nowPlayingController.currentSong.title
                                   .split('|')
                                   .first
                                   .trim()
@@ -71,10 +71,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
                                       fontWeight: FontWeight.bold),
                                   scrollAxis: Axis.horizontal,
                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                  blankSpace: 30.0, // Space between loops
-                                  velocity: 30.0, // Speed of scrolling
-                                  pauseAfterRound: const Duration(
-                                      seconds: 1), // Pause between loops
+                                  blankSpace: 30.0,
+                                  velocity: 30.0,
+                                  pauseAfterRound: const Duration(seconds: 1),
                                   startPadding: 0.0,
                                   accelerationDuration:
                                       const Duration(seconds: 1),

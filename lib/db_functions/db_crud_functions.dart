@@ -9,6 +9,7 @@ class HiveDatabase {
   static const String _mostlyPlayedBox = 'mostlyPlayedBox';
   static const String _playlistsBox = 'playlistsBox';
   static const String _currentSongBox = 'currentSongBox';
+  static const String _currentPlaylistBox = 'currentPlaylistBox';
 
   static Future<void> initHive() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -20,7 +21,8 @@ class HiveDatabase {
     await Hive.openBox<MusicModel>(_favoritesBox);
     await Hive.openBox<MusicModel>(_mostlyPlayedBox);
     await Hive.openBox<MyPlaylistModel>(_playlistsBox);
-    await Hive.openBox<MyPlaylistModel>(_currentSongBox);
+    await Hive.openBox<MusicModel>(_currentSongBox);
+    await Hive.openBox<MyPlaylistModel>(_currentPlaylistBox);
   }
 
   static Future<void> addMusic(String boxName, MusicModel music) async {

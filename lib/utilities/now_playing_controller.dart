@@ -24,6 +24,7 @@ class NowPlayingController {
   Duration position = Duration.zero;
   bool shuffleEnabled = false;
   bool repeatEnabled = false;
+  bool loopEnabled = true;
 
   MusicModel get currentSong => songs[currentIndex];
 
@@ -84,22 +85,19 @@ class NowPlayingController {
     }
   }
 
-  void shuffleModeChage() {
-    if (shuffleEnabled) {
-      shuffleEnabled = false;
-    } else {
-      shuffleEnabled = true;
-      repeatEnabled = false;
-    }
-    updateUI();
-  }
-
-  void repeatSongModeChage() {
-    if (repeatEnabled) {
-      repeatEnabled = false;
-    } else {
+  void toggleValues() {
+    if (loopEnabled) {
       repeatEnabled = true;
       shuffleEnabled = false;
+      loopEnabled = false;
+    } else if (repeatEnabled) {
+      repeatEnabled = false;
+      shuffleEnabled = true;
+      loopEnabled = false;
+    } else if (shuffleEnabled) {
+      repeatEnabled = false;
+      shuffleEnabled = false;
+      loopEnabled = true;
     }
     updateUI();
   }
