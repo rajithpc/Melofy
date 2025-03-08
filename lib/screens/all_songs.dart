@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/db_crud_functions.dart';
 import 'package:melofy/screens/now_playing_screen.dart';
 import 'package:melofy/widgets/common_list_item.dart';
+import 'package:melofy/widgets/mini_player.dart';
 import 'package:melofy/widgets/screen_navigators.dart';
 import 'package:melofy/widgets/search.dart';
 import '../db_functions/music_model.dart';
@@ -79,6 +80,7 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                     : const Center(child: Text("No audio files found")))
           ],
         ),
+        bottomNavigationBar: MiniPlayer(),
       ),
     );
   }

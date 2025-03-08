@@ -13,11 +13,12 @@ class NowPlayingController {
   NowPlayingController._internal() {
     audioPlayer = AudioPlayer();
   }
-
+  bool isControllerInitialized = false;
   late List<MusicModel> songs;
   late int currentIndex;
   late Function updateUI;
   ValueNotifier<Duration> positionNotifier = ValueNotifier(Duration.zero);
+  ValueNotifier<bool> playerNotifier = ValueNotifier(false);
   late AudioPlayer audioPlayer;
   bool isPlaying = false;
   Duration duration = Duration.zero;
@@ -29,6 +30,7 @@ class NowPlayingController {
   MusicModel get currentSong => songs[currentIndex];
 
   void initialize(List<MusicModel> songsList, int index, Function uiUpdater) {
+    isControllerInitialized = true;
     songs = songsList;
     currentIndex = index;
     updateUI = uiUpdater;
@@ -54,6 +56,7 @@ class NowPlayingController {
     await audioPlayer.play(DeviceFileSource(path));
     isPlaying = true;
     updateUI();
+    playerNotifier.value = !playerNotifier.value;
     HiveDatabase.updateMusic('mostlyPlayedBox', currentSong);
   }
 
@@ -64,6 +67,7 @@ class NowPlayingController {
       await audioPlayer.resume();
     }
     isPlaying = !isPlaying;
+    playerNotifier.value = !playerNotifier.value;
     updateUI();
   }
 
@@ -73,6 +77,8 @@ class NowPlayingController {
     } else if (!repeatEnabled && currentIndex < songs.length - 1) {
       currentIndex++;
     }
+    isPlaying = true;
+    playerNotifier.value = !playerNotifier.value;
     playSong(currentSong.path);
   }
 
@@ -83,6 +89,8 @@ class NowPlayingController {
       currentIndex--;
       playSong(currentSong.path);
     }
+    isPlaying = true;
+    playerNotifier.value = !playerNotifier.value;
   }
 
   void toggleValues() {

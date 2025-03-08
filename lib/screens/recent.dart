@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/widgets/common_list_item.dart';
+import 'package:melofy/widgets/mini_player.dart';
 import 'package:melofy/widgets/search.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/delete_confirmation.dart';
@@ -96,6 +97,7 @@ class _RecentState extends State<Recent> {
                       )),
           ],
         ),
+        bottomNavigationBar: MiniPlayer(),
       ),
     );
   }

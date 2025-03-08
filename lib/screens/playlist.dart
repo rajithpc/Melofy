@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/screens/playlist_songs_screen.dart';
 import 'package:melofy/widgets/delete_confirmation.dart';
+import 'package:melofy/widgets/mini_player.dart';
 import 'package:melofy/widgets/playlist_item.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/screen_navigators.dart';
@@ -135,8 +136,7 @@ class _PlaylistState extends State<Playlist> {
                   ),
           ],
         ),
-        // bottomNavigationBar: BottomPlay(songs(),
-        //   currentIndex: currentIndex,),
+        bottomNavigationBar: MiniPlayer(),
       ),
     );
   }

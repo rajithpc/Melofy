@@ -3,6 +3,7 @@ import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/screens/now_playing_screen.dart';
 import 'package:melofy/screens/playlist.dart';
 import 'package:melofy/widgets/common_list_item.dart';
+import 'package:melofy/widgets/mini_player.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/delete_confirmation.dart';
 import '../widgets/search.dart';
@@ -149,6 +150,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: MiniPlayer(),
     );
   }
 }

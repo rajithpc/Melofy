@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:melofy/widgets/common_list_item.dart';
+import 'package:melofy/widgets/mini_player.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
 import '../utilities/snackbar_message.dart';
@@ -98,6 +99,7 @@ class _FavoritesState extends State<Favorites> {
                       )),
           ],
         ),
+        bottomNavigationBar: MiniPlayer(),
       ),
     );
   }
