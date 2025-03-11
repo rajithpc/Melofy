@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:melofy/utilities/favorite_widget.dart';
+import 'package:melofy/widgets/favorite_widget.dart';
 
 import '../utilities/now_playing_controller.dart';
 
 class PlaybackControls extends StatelessWidget {
   final NowPlayingController controller;
 
-  const PlaybackControls({Key? key, required this.controller})
-      : super(key: key);
+  const PlaybackControls({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

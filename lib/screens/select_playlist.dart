@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/widgets/add_playlist.dart';
 import '../db_functions/db_crud_functions.dart';
-import '../utilities/snackbar_message.dart';
+import '../widgets/snackbar_message.dart';
 import '../widgets/search.dart';
 
 class SelectPlaylistScreen extends StatefulWidget {
   const SelectPlaylistScreen(
-      {required this.song, required this.onClose, Key? key})
-      : super(key: key);
+      {required this.song, required this.onClose, super.key});
 
   final MusicModel song;
   final VoidCallback onClose;

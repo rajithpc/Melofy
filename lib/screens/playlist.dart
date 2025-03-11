@@ -136,7 +136,7 @@ class _PlaylistState extends State<Playlist> {
                   ),
           ],
         ),
-        bottomNavigationBar: MiniPlayer(),
+        bottomNavigationBar: const MiniPlayer(),
       ),
     );
   }

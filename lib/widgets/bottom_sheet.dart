@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:melofy/utilities/snackbar_message.dart';
+import 'package:melofy/widgets/snackbar_message.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
+import '../screens/favorites.dart';
 import '../screens/select_playlist.dart';
+import 'favorite_widget.dart';
 
 class BottomSheetAddToDB extends StatefulWidget {
   final MusicModel song;
@@ -21,6 +23,12 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getFavorites();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -33,6 +41,7 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
         color: Colors.grey,
       ),
       onPressed: () {
+        getFavorites();
         showModalBottomSheet<void>(
           context: context,
           builder: (BuildContext context) {
@@ -95,12 +104,11 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                             MaterialPageRoute(
                               builder: (ctx) => SelectPlaylistScreen(
                                   song: widget.song,
-                                  onClose: () => Navigator.pop(context)),
+                                  onClose: () => setState(() {
+                                        Navigator.pop(context);
+                                      })),
                             ),
                           );
-                          setState(() {
-                            getFavorites();
-                          });
                         },
                         child: const Padding(
                           padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
@@ -140,6 +148,10 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                                 Navigator.pop(context);
                                 setState(() {
                                   getFavorites();
+                                  FavoriteWidget.refreshNotifier.value =
+                                      !FavoriteWidget.refreshNotifier.value;
+                                  Favorites.refreshNotifier.value =
+                                      !Favorites.refreshNotifier.value;
                                 });
                               },
                               child: const Padding(
@@ -169,6 +181,10 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                                 Navigator.pop(context);
                                 setState(() {
                                   getFavorites();
+                                  FavoriteWidget.refreshNotifier.value =
+                                      !FavoriteWidget.refreshNotifier.value;
+                                  Favorites.refreshNotifier.value =
+                                      !Favorites.refreshNotifier.value;
                                 });
                               },
                               child: const Padding(

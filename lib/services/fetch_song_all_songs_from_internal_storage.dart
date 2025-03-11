@@ -32,6 +32,4 @@ Future<void> fetchAndStoreSongs() async {
 
     await musicBox.put(music.id, music);
   }
-
-  print("All songs stored in Hive successfully!");
 }

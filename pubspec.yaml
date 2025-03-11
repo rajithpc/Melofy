@@ -31,21 +31,15 @@ dependencies:
   flutter:
     sdk: flutter
   permission_handler: ^11.3.1
+  path_provider: ^2.1.5
   on_audio_query: ^2.9.0
-  shared_preferences: ^2.3.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   marquee: ^2.0.0
   just_audio: ^0.9.43
   audio_service: ^0.18.16
   audio_session: ^0.1.24
-  just_audio_background: ^0.0.1-beta.15
   audioplayers: ^6.2.0
-  provider: ^6.1.2
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
   
 
 dev_dependencies:
@@ -79,7 +73,7 @@ flutter:
     - assets/images/add_to_favourite.png
     - assets/images/all_songs.png
     - assets/images/favorites.png
-    - assets/images/mostly-played.png
+    - assets/images/mostly.png
     - assets/images/emptyImage.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see

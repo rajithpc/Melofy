@@ -3,7 +3,7 @@ import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/mini_player.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
-import '../utilities/snackbar_message.dart';
+import '../widgets/snackbar_message.dart';
 import '../widgets/delete_confirmation.dart';
 import '../widgets/screen_navigators.dart';
 import '../widgets/search.dart';
@@ -12,11 +12,13 @@ import 'now_playing_screen.dart';
 class Favorites extends StatefulWidget {
   const Favorites({super.key});
 
+  static final ValueNotifier<bool> refreshNotifier = ValueNotifier<bool>(false);
+
   @override
-  _FavoritesState createState() => _FavoritesState();
+  FavoritesState createState() => FavoritesState();
 }
 
-class _FavoritesState extends State<Favorites> {
+class FavoritesState extends State<Favorites> {
   List<MusicModel> _favoriteSongs = [];
   List<MusicModel> _filteredFavorites = [];
   int currentIndex = 0;
@@ -25,13 +27,22 @@ class _FavoritesState extends State<Favorites> {
   void initState() {
     super.initState();
     fetchSongs();
+
+    Favorites.refreshNotifier.addListener(() {
+      fetchSongs();
+      setState(() {});
+    });
   }
 
   void fetchSongs() {
-    setState(() {
-      _favoriteSongs = HiveDatabase.getAllMusic('favoritesBox');
-      _filteredFavorites = _favoriteSongs..reversed;
-    });
+    _favoriteSongs = HiveDatabase.getAllMusic('favoritesBox').reversed.toList();
+    _filteredFavorites = List.from(_favoriteSongs);
+  }
+
+  @override
+  void dispose() {
+    Favorites.refreshNotifier.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -47,59 +58,66 @@ class _FavoritesState extends State<Favorites> {
             ),
             const ScreenNavigators(screenName: 'Favorites'),
             Expanded(
-                child: _filteredFavorites.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: _filteredFavorites.length,
-                        itemBuilder: (context, index) {
-                          final song = _filteredFavorites[index];
-                          return CommonListItem(
-                            song: song,
-                            onButtonPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => DeleteConfirmationDialog(
-                                  title: "Delete from Favorites",
-                                  content: "Are you sure you want to delete ?",
-                                  onConfirm: () {
-                                    HiveDatabase.deleteMusic(
-                                        'favoritesBox', song.id);
-                                    SnackbarMessage.showSnackbar(
-                                        context, 'Song removed from favorites');
-                                    setState(() {
-                                      _favoriteSongs.removeWhere(
-                                          (item) => item.id == song.id);
-                                      _filteredFavorites.removeWhere(
-                                          (item) => item.id == song.id);
-                                    });
-                                  },
+              child: _filteredFavorites.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _filteredFavorites.length,
+                      itemBuilder: (context, index) {
+                        final song = _filteredFavorites[index];
+                        return CommonListItem(
+                          song: song,
+                          onButtonPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => DeleteConfirmationDialog(
+                                title: "Delete from Favorites",
+                                content: "Are you sure you want to delete?",
+                                onConfirm: () {
+                                  HiveDatabase.deleteMusic(
+                                      'favoritesBox', song.id);
+                                  SnackbarMessage.showSnackbar(
+                                      context, 'Song removed from favorites');
+                                  setState(() {
+                                    _favoriteSongs.removeWhere(
+                                        (item) => item.id == song.id);
+                                    _filteredFavorites.removeWhere(
+                                        (item) => item.id == song.id);
+                                  });
+
+                                  // Notify other widgets about the change
+                                  Favorites.refreshNotifier.value =
+                                      !Favorites.refreshNotifier.value;
+                                },
+                              ),
+                            );
+                          },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NowPlayingScreen(
+                                  songs: _favoriteSongs,
+                                  currentIndex: _favoriteSongs.indexOf(song),
                                 ),
-                              );
-                            },
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NowPlayingScreen(
-                                    songs: _favoriteSongs,
-                                    currentIndex: index,
-                                  ),
-                                ),
-                              );
-                            },
-                            screenType: ScreenType.favorites,
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Text(
-                          'No Favorite Songs',
-                          style: TextStyle(
-                              color: Colors.grey, fontFamily: 'melofy-font'),
+                              ),
+                            );
+                          },
+                          screenType: ScreenType.favorites,
+                        );
+                      },
+                    )
+                  : const Center(
+                      child: Text(
+                        'No Favorite Songs',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'melofy-font',
                         ),
-                      )),
+                      ),
+                    ),
+            ),
           ],
         ),
-        bottomNavigationBar: MiniPlayer(),
+        bottomNavigationBar: const MiniPlayer(),
       ),
     );
   }
@@ -107,7 +125,7 @@ class _FavoritesState extends State<Favorites> {
   void _filterFavorites(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredFavorites = _favoriteSongs;
+        _filteredFavorites = List.from(_favoriteSongs);
       } else {
         _filteredFavorites = _favoriteSongs
             .where((song) =>

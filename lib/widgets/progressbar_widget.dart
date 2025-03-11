@@ -4,8 +4,7 @@ import '../utilities/now_playing_controller.dart';
 class ProgressBarWidget extends StatelessWidget {
   final NowPlayingController controller;
 
-  const ProgressBarWidget({Key? key, required this.controller})
-      : super(key: key);
+  const ProgressBarWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

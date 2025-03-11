@@ -31,7 +31,8 @@ class ScreenNavigators extends StatelessWidget {
                   'All Songs',
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AllSongsScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const AllSongsScreen()),
                   ),
                 ),
               if (screenName != "Recent")
@@ -67,7 +68,7 @@ class ScreenNavigators extends StatelessWidget {
               if (screenName != "Mostly played songs")
                 _buildNavItem(
                   context,
-                  'assets/images/playlist.png',
+                  'assets/images/mostly.png',
                   'Mostly played',
                   () => Navigator.push(
                     context,

@@ -9,10 +9,10 @@ class AddPlaylist extends StatefulWidget {
   const AddPlaylist({super.key, required this.playlist, required this.onClose});
 
   @override
-  _AddPlaylistState createState() => _AddPlaylistState();
+  AddPlaylistState createState() => AddPlaylistState();
 }
 
-class _AddPlaylistState extends State<AddPlaylist> {
+class AddPlaylistState extends State<AddPlaylist> {
   final TextEditingController _playlistController = TextEditingController();
 
   void _createPlaylist() {

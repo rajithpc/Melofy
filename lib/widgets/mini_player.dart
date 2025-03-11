@@ -6,10 +6,11 @@ import 'package:marquee/marquee.dart';
 
 class MiniPlayer extends StatefulWidget {
   @override
-  State<MiniPlayer> createState() => _MiniPlayerState();
+  State<MiniPlayer> createState() => MiniPlayerState();
+  const MiniPlayer({super.key});
 }
 
-class _MiniPlayerState extends State<MiniPlayer> {
+class MiniPlayerState extends State<MiniPlayer> {
   final nowPlayingController = NowPlayingController();
 
   @override
@@ -112,7 +113,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
                                             .first
                                             .trim(),
                                     style: const TextStyle(
-                                        color: Colors.grey, fontSize: 14),
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontFamily: 'melofy-font'),
                                     overflow: TextOverflow.ellipsis),
                               ],
                             ),

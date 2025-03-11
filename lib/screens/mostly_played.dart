@@ -11,10 +11,10 @@ class MostlyPlayed extends StatefulWidget {
   const MostlyPlayed({super.key});
 
   @override
-  _MostlyPlayedState createState() => _MostlyPlayedState();
+  MostlyPlayedState createState() => MostlyPlayedState();
 }
 
-class _MostlyPlayedState extends State<MostlyPlayed> {
+class MostlyPlayedState extends State<MostlyPlayed> {
   List<MusicModel> _mostlyPlayedSongs = [];
   List<MusicModel> _filteredMostlyPlayedSongs = [];
   int currentIndex = 0;
@@ -60,7 +60,8 @@ class _MostlyPlayedState extends State<MostlyPlayed> {
                                   MaterialPageRoute(
                                     builder: (context) => NowPlayingScreen(
                                       songs: _mostlyPlayedSongs,
-                                      currentIndex: index,
+                                      currentIndex:
+                                          _mostlyPlayedSongs.indexOf(song),
                                     ),
                                   ),
                                 );
@@ -77,7 +78,7 @@ class _MostlyPlayedState extends State<MostlyPlayed> {
                       )),
           ],
         ),
-        bottomNavigationBar: MiniPlayer(),
+        bottomNavigationBar: const MiniPlayer(),
       ),
     );
   }

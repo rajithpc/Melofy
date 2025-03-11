@@ -10,14 +10,13 @@ class PlaylistItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const PlaylistItem(
-      {Key? key,
+      {super.key,
       required this.playlistName,
       required this.songCount,
       required this.artworkId,
       required this.onEdit,
       required this.onDelete,
-      required this.onTap})
-      : super(key: key);
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {

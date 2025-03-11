@@ -6,14 +6,14 @@ import 'package:melofy/widgets/mini_player.dart';
 import 'package:melofy/widgets/screen_navigators.dart';
 import 'package:melofy/widgets/search.dart';
 import '../db_functions/music_model.dart';
-import '../utilities/shared_preference_helper.dart';
 
 class AllSongsScreen extends StatefulWidget {
+  const AllSongsScreen({super.key});
   @override
-  _AllSongsScreenState createState() => _AllSongsScreenState();
+  AllSongsScreenState createState() => AllSongsScreenState();
 }
 
-class _AllSongsScreenState extends State<AllSongsScreen> {
+class AllSongsScreenState extends State<AllSongsScreen> {
   List<MusicModel> _songs = [];
   List<MusicModel> _filteredSongs = [];
 
@@ -60,12 +60,10 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                                     MaterialPageRoute(
                                         builder: (context) => NowPlayingScreen(
                                               songs: _songs,
-                                              currentIndex: index,
+                                              currentIndex:
+                                                  _songs.indexOf(song),
                                             )),
                                   );
-                                  setState(() async {
-                                    MusicIdStorage.saveMusicId(song.id);
-                                  });
                                 },
                                 screenType: ScreenType.allSongs,
                               );
@@ -80,7 +78,7 @@ class _AllSongsScreenState extends State<AllSongsScreen> {
                     : const Center(child: Text("No audio files found")))
           ],
         ),
-        bottomNavigationBar: MiniPlayer(),
+        bottomNavigationBar: const MiniPlayer(),
       ),
     );
   }

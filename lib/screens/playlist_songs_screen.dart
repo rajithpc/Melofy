@@ -14,10 +14,10 @@ class PlaylistSongsScreen extends StatefulWidget {
   final MyPlaylistModel playlist;
 
   @override
-  _PlaylistSongsScreenState createState() => _PlaylistSongsScreenState();
+  PlaylistSongsScreenState createState() => PlaylistSongsScreenState();
 }
 
-class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
+class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
   List<MusicModel> _songs = [];
   List<MusicModel> _filteredSongs = [];
 
@@ -63,20 +63,21 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
               List<MusicModel> selectedSongs = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      SelectSongsScreen(playlist: widget.playlist),
+                  builder: (context) => SelectSongsScreen(
+                    playlistSongs: _songs,
+                  ),
                 ),
               );
 
+              HiveDatabase.removeMultipleSongsFromPlaylist(
+                  widget.playlist.playlistId, _songs);
+
               if (selectedSongs.isNotEmpty) {
-                HiveDatabase.removeMultipleSongsFromPlaylist(
-                    widget.playlist.playlistId, widget.playlist.songs);
                 HiveDatabase.addMultipleSongsToPlaylist(
                     widget.playlist.playlistId, selectedSongs);
-                setState(() {
-                  fetchSongs();
-                });
               }
+
+              fetchSongs();
             },
           ),
         ],
@@ -139,7 +140,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                               MaterialPageRoute(
                                 builder: (context) => NowPlayingScreen(
                                   songs: _songs,
-                                  currentIndex: index,
+                                  currentIndex: _songs.indexOf(song),
                                 ),
                               ),
                             );
@@ -150,7 +151,7 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: MiniPlayer(),
+      bottomNavigationBar: const MiniPlayer(),
     );
   }
 }

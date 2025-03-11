@@ -12,17 +12,14 @@ class NowPlayingScreen extends StatefulWidget {
   final List<MusicModel> songs;
   final int currentIndex;
 
-  const NowPlayingScreen({
-    Key? key,
-    required this.songs,
-    required this.currentIndex,
-  }) : super(key: key);
+  const NowPlayingScreen(
+      {required this.songs, required this.currentIndex, super.key});
 
   @override
-  _NowPlayingScreenState createState() => _NowPlayingScreenState();
+  NowPlayingScreenState createState() => NowPlayingScreenState();
 }
 
-class _NowPlayingScreenState extends State<NowPlayingScreen> {
+class NowPlayingScreenState extends State<NowPlayingScreen> {
   bool isAddToDB = true;
   final nowPlayingController = NowPlayingController();
 

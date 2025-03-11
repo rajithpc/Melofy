@@ -12,10 +12,10 @@ class Recent extends StatefulWidget {
   const Recent({super.key});
 
   @override
-  _RecentState createState() => _RecentState();
+  RecentState createState() => RecentState();
 }
 
-class _RecentState extends State<Recent> {
+class RecentState extends State<Recent> {
   List<MusicModel> _recentSongs = [];
   List<MusicModel> _filteredRecentSongs = [];
   int currentIndex = 0;
@@ -29,7 +29,7 @@ class _RecentState extends State<Recent> {
   void fetchSongs() {
     setState(() {
       _recentSongs = HiveDatabase.getAllMusic('recentlyPlayedBox');
-      _filteredRecentSongs = _recentSongs..reversed;
+      _filteredRecentSongs = _recentSongs.reversed.toList();
     });
   }
 
@@ -80,7 +80,7 @@ class _RecentState extends State<Recent> {
                                   MaterialPageRoute(
                                     builder: (context) => NowPlayingScreen(
                                       songs: _recentSongs,
-                                      currentIndex: index,
+                                      currentIndex: _recentSongs.indexOf(song),
                                     ),
                                   ),
                                 );
@@ -97,7 +97,7 @@ class _RecentState extends State<Recent> {
                       )),
           ],
         ),
-        bottomNavigationBar: MiniPlayer(),
+        bottomNavigationBar: const MiniPlayer(),
       ),
     );
   }

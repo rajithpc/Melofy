@@ -8,7 +8,7 @@ import '../utilities/now_playing_controller.dart';
 class ArtworkWidget extends StatelessWidget {
   final NowPlayingController controller;
 
-  const ArtworkWidget({Key? key, required this.controller}) : super(key: key);
+  const ArtworkWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

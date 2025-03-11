@@ -21,8 +21,17 @@ class HiveDatabase {
     await Hive.openBox<MyPlaylistModel>(_playlistsBox);
   }
 
+  // static Future<void> addMusic(String boxName, MusicModel music) async {
+  //   final box = Hive.box<MusicModel>(boxName);
+  //   await box.put(music.id, music);
+  // }
+
   static Future<void> addMusic(String boxName, MusicModel music) async {
     final box = Hive.box<MusicModel>(boxName);
+
+    if (box.containsKey(music.id)) {
+      await box.delete(music.id);
+    }
     await box.put(music.id, music);
   }
 
