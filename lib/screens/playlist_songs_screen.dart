@@ -119,8 +119,8 @@ class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                             showDialog(
                               context: context,
                               builder: (context) => DeleteConfirmationDialog(
-                                title: "Delete Playlist",
-                                content: "Are you sure you want to delete ?",
+                                title: "Remove from playlist",
+                                content: "Are you sure you want to remove ?",
                                 onConfirm: () {
                                   HiveDatabase.removeMusicFromPlaylist(
                                       widget.playlist.playlistId, song);

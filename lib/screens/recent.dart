@@ -28,8 +28,8 @@ class RecentState extends State<Recent> {
 
   void fetchSongs() {
     setState(() {
-      _recentSongs = HiveDatabase.getAllMusic('recentlyPlayedBox');
-      _filteredRecentSongs = _recentSongs.reversed.toList();
+      _recentSongs = HiveDatabase.getAllRecents();
+      _filteredRecentSongs = _recentSongs;
     });
   }
 
@@ -58,9 +58,9 @@ class RecentState extends State<Recent> {
                                   context: context,
                                   builder: (context) =>
                                       DeleteConfirmationDialog(
-                                    title: "Delete from recents",
+                                    title: "Remove from recents",
                                     content:
-                                        "Are you sure you want to delete ?",
+                                        "Are you sure you want to remove ?",
                                     onConfirm: () {
                                       HiveDatabase.deleteMusic(
                                           'recentlyPlayedBox', song.id);

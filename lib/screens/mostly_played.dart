@@ -27,8 +27,7 @@ class MostlyPlayedState extends State<MostlyPlayed> {
 
   void fetchSongs() {
     setState(() {
-      _mostlyPlayedSongs = HiveDatabase.getAllMusic('mostlyPlayedBox');
-      _mostlyPlayedSongs.sort((a, b) => b.playCount.compareTo(a.playCount));
+      _mostlyPlayedSongs = HiveDatabase.getAllMostlyPlayedSongs();
       _filteredMostlyPlayedSongs = _mostlyPlayedSongs;
     });
   }
@@ -66,7 +65,7 @@ class MostlyPlayedState extends State<MostlyPlayed> {
                                   ),
                                 );
                               },
-                              screenType: ScreenType.recents);
+                              screenType: ScreenType.mostlyPlayed);
                         },
                       )
                     : const Center(

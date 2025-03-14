@@ -24,6 +24,8 @@ class MusicModelAdapter extends TypeAdapter<MusicModel> {
       playCount: fields[4] as int,
       data: fields[5] as String?,
       album: fields[6] as String?,
+      recentNo: fields[7] as int,
+      favoriteNo: fields[8] as int,
     );
   }
 

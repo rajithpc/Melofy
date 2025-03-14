@@ -24,6 +24,12 @@ class MusicModel {
   @HiveField(6)
   final String? album;
 
+  @HiveField(7)
+  final int recentNo;
+
+  @HiveField(8)
+  final int favoriteNo;
+
   MusicModel(
       {required this.id,
       required this.title,
@@ -31,7 +37,9 @@ class MusicModel {
       required this.path,
       required this.playCount,
       required this.data,
-      required this.album});
+      required this.album,
+      required this.recentNo,
+      required this.favoriteNo});
 }
 
 @HiveType(typeId: 1)

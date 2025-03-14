@@ -185,4 +185,107 @@ class HiveDatabase {
 
     return playlist.songs;
   }
+///////////////////////////////////////////////////////////////////////////////
+
+  static Future<void> addToRecents(MusicModel music) async {
+    final box = Hive.box<MusicModel>(_recentlyPlayedBox);
+
+    if (box.containsKey(music.id)) {
+      await box.delete(music.id);
+    }
+
+    int generateUniqueId() {
+      final recents = getAllMusic(_recentlyPlayedBox);
+      return (recents.isNotEmpty
+              ? recents
+                  .map((recents) => recents.recentNo)
+                  .reduce((a, b) => a > b ? a : b)
+              : 0) +
+          1;
+    }
+
+    MusicModel newRecentSong = MusicModel(
+      id: music.id,
+      title: music.title,
+      artist: music.artist,
+      path: music.path,
+      data: music.data,
+      album: music.album,
+      playCount: music.playCount,
+      favoriteNo: music.favoriteNo,
+      recentNo: generateUniqueId(),
+    );
+    await box.put(newRecentSong.id, newRecentSong);
+  }
+
+  static List<MusicModel> getAllRecents() {
+    final box = Hive.box<MusicModel>(_recentlyPlayedBox);
+    List<MusicModel> recents = box.values.toList();
+    recents.sort((a, b) => b.recentNo.compareTo(a.recentNo));
+    return recents;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  static Future<void> addToFavorites(MusicModel music) async {
+    final box = Hive.box<MusicModel>(_favoritesBox);
+
+    if (box.containsKey(music.id)) {
+      await box.delete(music.id);
+    }
+
+    int generateUniqueId() {
+      final favorites = getAllMusic(_favoritesBox);
+      return (favorites.isNotEmpty
+              ? favorites
+                  .map((favorites) => favorites.favoriteNo)
+                  .reduce((a, b) => a > b ? a : b)
+              : 0) +
+          1;
+    }
+
+    MusicModel newFavoriteSong = MusicModel(
+      id: music.id,
+      title: music.title,
+      artist: music.artist,
+      path: music.path,
+      data: music.data,
+      album: music.album,
+      playCount: music.playCount,
+      recentNo: music.recentNo,
+      favoriteNo: generateUniqueId(),
+    );
+    await box.put(newFavoriteSong.id, newFavoriteSong);
+  }
+
+  static List<MusicModel> getAllFavorites() {
+    final box = Hive.box<MusicModel>(_favoritesBox);
+    List<MusicModel> favorites = box.values.toList();
+    favorites.sort((a, b) => b.favoriteNo.compareTo(a.favoriteNo));
+    return favorites;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  static List<MusicModel> getAllMostlyPlayedSongs() {
+    final box = Hive.box<MusicModel>(_musicBox);
+    List<MusicModel> mostlyPlayed = box.values.toList();
+    mostlyPlayed.sort((a, b) => b.playCount.compareTo(a.playCount));
+    return mostlyPlayed;
+  }
+
+  static Future<void> updatePlayCount(MusicModel music) async {
+    final box = Hive.box<MusicModel>(_musicBox);
+    MusicModel song = MusicModel(
+        id: music.id,
+        title: music.title,
+        artist: music.artist,
+        path: music.path,
+        playCount: music.playCount + 1,
+        data: music.data,
+        album: music.album,
+        recentNo: music.recentNo,
+        favoriteNo: music.favoriteNo);
+    await box.put(song.id, song);
+  }
 }

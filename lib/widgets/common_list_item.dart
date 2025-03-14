@@ -3,7 +3,7 @@ import 'package:melofy/db_functions/music_model.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'bottom_sheet.dart';
 
-enum ScreenType { allSongs, recents, favorites, playlistSongs }
+enum ScreenType { allSongs, recents, favorites, playlistSongs, mostlyPlayed }
 
 class CommonListItem extends StatelessWidget {
   const CommonListItem(
@@ -58,7 +58,9 @@ class CommonListItem extends StatelessWidget {
             fontFamily: 'melofy-font',
           ),
         ),
-        trailing: screenType.index == 0 || screenType.index == 1
+        trailing: screenType.index == 0 ||
+                screenType.index == 1 ||
+                screenType.index == 4
             ? BottomSheetAddToDB(song: song)
             : ElevatedButton(
                 onPressed: onButtonPressed,

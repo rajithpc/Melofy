@@ -19,15 +19,15 @@ class DeleteConfirmationDialog extends StatelessWidget {
       content: Text(content),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(), // Cancel button
+          onPressed: () => Navigator.of(context).pop(),
           child: const Text("Cancel"),
         ),
         TextButton(
           onPressed: () {
-            onConfirm(); // Execute delete function
-            Navigator.of(context).pop(); // Close dialog
+            onConfirm();
+            Navigator.of(context).pop();
           },
-          child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          child: const Text("Remove", style: TextStyle(color: Colors.red)),
         ),
       ],
     );

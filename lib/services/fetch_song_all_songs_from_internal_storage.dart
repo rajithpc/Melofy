@@ -28,7 +28,9 @@ Future<void> fetchAndStoreSongs() async {
         path: song.data,
         playCount: 0,
         data: song.data,
-        album: song.album);
+        album: song.album,
+        recentNo: 0,
+        favoriteNo: 0);
 
     await musicBox.put(music.id, music);
   }

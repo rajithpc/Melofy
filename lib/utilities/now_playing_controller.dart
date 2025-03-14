@@ -57,7 +57,7 @@ class NowPlayingController {
     isPlaying = true;
     updateUI();
     playerNotifier.value = !playerNotifier.value;
-    HiveDatabase.updateMusic('mostlyPlayedBox', currentSong);
+    HiveDatabase.updatePlayCount(currentSong);
   }
 
   void togglePlayPause() async {

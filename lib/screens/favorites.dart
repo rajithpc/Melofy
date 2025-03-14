@@ -35,8 +35,8 @@ class FavoritesState extends State<Favorites> {
   }
 
   void fetchSongs() {
-    _favoriteSongs = HiveDatabase.getAllMusic('favoritesBox').reversed.toList();
-    _filteredFavorites = List.from(_favoriteSongs);
+    _favoriteSongs = HiveDatabase.getAllFavorites();
+    _filteredFavorites = _favoriteSongs;
   }
 
   @override
@@ -69,8 +69,8 @@ class FavoritesState extends State<Favorites> {
                             showDialog(
                               context: context,
                               builder: (context) => DeleteConfirmationDialog(
-                                title: "Delete from Favorites",
-                                content: "Are you sure you want to delete?",
+                                title: "Remove from Favorites",
+                                content: "Are you sure you want to remove?",
                                 onConfirm: () {
                                   HiveDatabase.deleteMusic(
                                       'favoritesBox', song.id);
@@ -83,7 +83,6 @@ class FavoritesState extends State<Favorites> {
                                         (item) => item.id == song.id);
                                   });
 
-                                  // Notify other widgets about the change
                                   Favorites.refreshNotifier.value =
                                       !Favorites.refreshNotifier.value;
                                 },

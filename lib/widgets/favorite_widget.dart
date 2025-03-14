@@ -25,7 +25,7 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
   }
 
   void getFavorites() {
-    favoriteSongs = HiveDatabase.getAllMusic('favoritesBox');
+    favoriteSongs = HiveDatabase.getAllFavorites();
   }
 
   @override
@@ -44,7 +44,7 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
               SnackbarMessage.showSnackbar(
                   context, 'Song removed from favorites');
             } else {
-              HiveDatabase.addMusic('favoritesBox', widget.song);
+              HiveDatabase.addToFavorites(widget.song);
               SnackbarMessage.showSnackbar(context, 'Song added to favorites');
             }
 

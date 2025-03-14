@@ -19,7 +19,7 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
   List<MusicModel> favoriteSongs = [];
 
   void getFavorites() {
-    favoriteSongs = HiveDatabase.getAllMusic('favoritesBox');
+    favoriteSongs = HiveDatabase.getAllFavorites();
   }
 
   @override
@@ -174,8 +174,7 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                             )
                           : GestureDetector(
                               onTap: () {
-                                HiveDatabase.addMusic(
-                                    'favoritesBox', widget.song);
+                                HiveDatabase.addToFavorites(widget.song);
                                 SnackbarMessage.showSnackbar(
                                     context, 'song added to favorites');
                                 Navigator.pop(context);
