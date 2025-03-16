@@ -267,11 +267,14 @@ class HiveDatabase {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  static List<MusicModel> getAllMostlyPlayedSongs() {
+  static List<MusicModel> getMostlyPlayedSongs() {
     final box = Hive.box<MusicModel>(_musicBox);
-    List<MusicModel> mostlyPlayed = box.values.toList();
+    List<MusicModel> mostlyPlayed =
+        box.values.where((song) => song.playCount > 0).toList();
     mostlyPlayed.sort((a, b) => b.playCount.compareTo(a.playCount));
-    return mostlyPlayed;
+    return mostlyPlayed.length >= 20
+        ? mostlyPlayed.sublist(0, 20)
+        : mostlyPlayed;
   }
 
   static Future<void> updatePlayCount(MusicModel music) async {
@@ -282,6 +285,21 @@ class HiveDatabase {
         artist: music.artist,
         path: music.path,
         playCount: music.playCount + 1,
+        data: music.data,
+        album: music.album,
+        recentNo: music.recentNo,
+        favoriteNo: music.favoriteNo);
+    await box.put(song.id, song);
+  }
+
+  static Future<void> removeFromMostlyPlayed(MusicModel music) async {
+    final box = Hive.box<MusicModel>(_musicBox);
+    MusicModel song = MusicModel(
+        id: music.id,
+        title: music.title,
+        artist: music.artist,
+        path: music.path,
+        playCount: 0,
         data: music.data,
         album: music.album,
         recentNo: music.recentNo,

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:melofy/widgets/common_list_item.dart';
 import '../db_functions/music_model.dart';
 import '../services/playback_controls.dart';
 import '../utilities/now_playing_controller.dart';
@@ -78,8 +79,10 @@ class NowPlayingScreenState extends State<NowPlayingScreen> {
               size: 40, color: Colors.grey),
           onPressed: () => Navigator.pop(context),
         ),
-        BottomSheetAddToDB(
+        BottomSheetWidget(
           song: nowPlayingController.currentSong,
+          screenType: ScreenType.allSongs,
+          onButtonPressed: () {},
         ),
       ],
     );

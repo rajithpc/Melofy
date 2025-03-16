@@ -61,7 +61,11 @@ class CommonListItem extends StatelessWidget {
         trailing: screenType.index == 0 ||
                 screenType.index == 1 ||
                 screenType.index == 4
-            ? BottomSheetAddToDB(song: song)
+            ? BottomSheetWidget(
+                song: song,
+                screenType: screenType,
+                onButtonPressed: onButtonPressed,
+              )
             : ElevatedButton(
                 onPressed: onButtonPressed,
                 style: ElevatedButton.styleFrom(

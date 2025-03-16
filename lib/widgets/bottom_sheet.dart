@@ -5,17 +5,25 @@ import '../db_functions/db_crud_functions.dart';
 import '../db_functions/music_model.dart';
 import '../screens/favorites.dart';
 import '../screens/select_playlist.dart';
+import 'common_list_item.dart';
 import 'favorite_widget.dart';
 
-class BottomSheetAddToDB extends StatefulWidget {
+class BottomSheetWidget extends StatefulWidget {
   final MusicModel song;
-  const BottomSheetAddToDB({required this.song, super.key});
+  final ScreenType screenType;
+  final VoidCallback onButtonPressed;
+
+  const BottomSheetWidget(
+      {required this.song,
+      required this.screenType,
+      required this.onButtonPressed,
+      super.key});
 
   @override
-  State<BottomSheetAddToDB> createState() => _BottomSheetAddToDBState();
+  State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
 }
 
-class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
+class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   List<MusicModel> favoriteSongs = [];
 
   void getFavorites() {
@@ -51,11 +59,11 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                 topRight: Radius.circular(20),
               ),
               child: Container(
-                height: 200,
                 color: Colors.black,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       ListTile(
                         leading: ClipRRect(
@@ -130,13 +138,15 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                           ),
                         ),
                       ),
+                      ////////////////////////////////////////////////////////
                       const Padding(
                         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                         child: Divider(
-                          height: 0.2,
+                          height: 10,
                           color: Colors.grey,
                         ),
                       ),
+                      //////////////////////////////////////////////////////
                       favoriteSongs
                               .any((favSong) => favSong.id == widget.song.id)
                           ? GestureDetector(
@@ -204,6 +214,71 @@ class _BottomSheetAddToDBState extends State<BottomSheetAddToDB> {
                                 ),
                               ),
                             ),
+
+                      //////////////////////////////////////////////////////////////
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                        child: Divider(
+                          height: 10,
+                          color: Colors.grey,
+                        ),
+                      ),
+
+                      /////////////////////////////////////////////////////////
+
+                      widget.screenType.index == 1
+                          ? GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                widget.onButtonPressed();
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.remove_circle_outline_rounded,
+                                        color: Colors.grey),
+                                    SizedBox(width: 20),
+                                    Text(
+                                      'Remove from recents',
+                                      style: TextStyle(
+                                          fontFamily: 'melofy-font',
+                                          color: Colors.grey,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
+
+                      /////////////////////////////////////////////////////////
+
+                      widget.screenType.index == 4
+                          ? GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                widget.onButtonPressed();
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.remove_circle_outline_rounded,
+                                        color: Colors.grey),
+                                    SizedBox(width: 20),
+                                    Text(
+                                      'Remove from mostly played',
+                                      style: TextStyle(
+                                          fontFamily: 'melofy-font',
+                                          color: Colors.grey,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
                     ],
                   ),
                 ),

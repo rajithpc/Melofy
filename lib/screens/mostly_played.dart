@@ -3,6 +3,7 @@ import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import 'package:melofy/widgets/search.dart';
 import '../db_functions/db_crud_functions.dart';
+import '../widgets/delete_confirmation.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/screen_navigators.dart';
 import 'now_playing_screen.dart';
@@ -27,7 +28,7 @@ class MostlyPlayedState extends State<MostlyPlayed> {
 
   void fetchSongs() {
     setState(() {
-      _mostlyPlayedSongs = HiveDatabase.getAllMostlyPlayedSongs();
+      _mostlyPlayedSongs = HiveDatabase.getMostlyPlayedSongs();
       _filteredMostlyPlayedSongs = _mostlyPlayedSongs;
     });
   }
@@ -52,7 +53,26 @@ class MostlyPlayedState extends State<MostlyPlayed> {
                           final song = _filteredMostlyPlayedSongs[index];
                           return CommonListItem(
                               song: song,
-                              onButtonPressed: () {},
+                              onButtonPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      DeleteConfirmationDialog(
+                                    title: "Remove from mostly",
+                                    content:
+                                        "Are you sure you want to remove ?",
+                                    onConfirm: () {
+                                      HiveDatabase.removeFromMostlyPlayed(song);
+                                      setState(() {
+                                        _mostlyPlayedSongs.removeWhere(
+                                            (item) => item.id == song.id);
+                                        _filteredMostlyPlayedSongs.removeWhere(
+                                            (item) => item.id == song.id);
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
                               onTap: () {
                                 Navigator.push(
                                   context,

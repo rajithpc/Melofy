@@ -53,7 +53,6 @@ class AllSongsScreenState extends State<AllSongsScreen> {
                                 song: song,
                                 onButtonPressed: () {},
                                 onTap: () {
-                                  HiveDatabase.addToRecents(song);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
