@@ -41,8 +41,8 @@ class CommonListItem extends StatelessWidget {
           ),
         ),
         title: Text(
-          song.title.length > 20
-              ? '${song.title.substring(0, 20)}...'
+          song.title.length > 30
+              ? '${song.title.substring(0, 30)}...'
               : song.title,
           style: const TextStyle(
             color: Colors.white,
@@ -66,22 +66,12 @@ class CommonListItem extends StatelessWidget {
                 screenType: screenType,
                 onButtonPressed: onButtonPressed,
               )
-            : ElevatedButton(
-                onPressed: onButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
+            : GestureDetector(
+                onTap: onButtonPressed,
+                child: Icon(
+                  screenType.index == 2 ? Icons.favorite : Icons.more_vert,
+                  color: Colors.grey,
                 ),
-                child: screenType.index == 2
-                    ? const Icon(
-                        Icons.favorite,
-                        color: Colors.grey,
-                      )
-                    : const Icon(
-                        Icons.more_vert,
-                        color: Colors.grey,
-                      ),
               ),
         onTap: onTap,
       ),

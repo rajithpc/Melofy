@@ -57,7 +57,7 @@ class NowPlayingController {
     isPlaying = true;
     updateUI();
     playerNotifier.value = !playerNotifier.value;
-    HiveDatabase.updatePlayCount(currentSong);
+    HiveDatabase.addOrUpdatePlayCount(currentSong);
     HiveDatabase.addToRecents(currentSong);
   }
 
@@ -78,7 +78,7 @@ class NowPlayingController {
     } else if (!repeatEnabled && currentIndex < songs.length - 1) {
       currentIndex++;
     }
-    HiveDatabase.updatePlayCount(currentSong);
+    HiveDatabase.addOrUpdatePlayCount(currentSong);
     HiveDatabase.addToRecents(currentSong);
     isPlaying = true;
     playerNotifier.value = !playerNotifier.value;
@@ -92,7 +92,7 @@ class NowPlayingController {
       currentIndex--;
       playSong(currentSong.path);
     }
-    HiveDatabase.updatePlayCount(currentSong);
+    HiveDatabase.addOrUpdatePlayCount(currentSong);
     HiveDatabase.addToRecents(currentSong);
     isPlaying = true;
     playerNotifier.value = !playerNotifier.value;

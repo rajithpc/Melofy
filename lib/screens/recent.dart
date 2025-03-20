@@ -6,6 +6,7 @@ import 'package:melofy/widgets/search.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/delete_confirmation.dart';
 import '../widgets/screen_navigators.dart';
+import '../widgets/snackbar_message.dart';
 import 'now_playing_screen.dart';
 
 class Recent extends StatefulWidget {
@@ -64,6 +65,8 @@ class RecentState extends State<Recent> {
                                     onConfirm: () {
                                       HiveDatabase.deleteMusic(
                                           'recentlyPlayedBox', song.id);
+                                      SnackbarMessage.showSnackbar(
+                                          context, 'Song removed from recents');
                                       setState(() {
                                         _recentSongs.removeWhere(
                                             (item) => item.id == song.id);

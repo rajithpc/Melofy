@@ -38,17 +38,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        elevation: 0,
-      ),
+    return GestureDetector(
       child: const Icon(
         Icons.more_vert,
         color: Colors.grey,
       ),
-      onPressed: () {
+      onTap: () {
         getFavorites();
         showModalBottomSheet<void>(
           context: context,
@@ -107,14 +102,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (ctx) => SelectPlaylistScreen(
                                   song: widget.song,
-                                  onClose: () => setState(() {
-                                        Navigator.pop(context);
-                                      })),
+                                  onClose: () => setState(() {})),
                             ),
                           );
                         },
@@ -154,7 +148,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                                 HiveDatabase.deleteMusic(
                                     'favoritesBox', widget.song.id);
                                 SnackbarMessage.showSnackbar(
-                                    context, 'song removed from favorites');
+                                    context, 'Song removed from favorites');
                                 Navigator.pop(context);
                                 setState(() {
                                   getFavorites();
@@ -186,7 +180,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                               onTap: () {
                                 HiveDatabase.addToFavorites(widget.song);
                                 SnackbarMessage.showSnackbar(
-                                    context, 'song added to favorites');
+                                    context, 'Song added to favorites');
                                 Navigator.pop(context);
                                 setState(() {
                                   getFavorites();
@@ -216,13 +210,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                             ),
 
                       //////////////////////////////////////////////////////////////
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                        child: Divider(
-                          height: 10,
-                          color: Colors.grey,
-                        ),
-                      ),
+                      widget.screenType.index == 1 ||
+                              widget.screenType.index == 4
+                          ? const Padding(
+                              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                              child: Divider(
+                                height: 10,
+                                color: Colors.grey,
+                              ),
+                            )
+                          : const SizedBox(),
 
                       /////////////////////////////////////////////////////////
 

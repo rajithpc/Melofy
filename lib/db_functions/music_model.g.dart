@@ -32,7 +32,7 @@ class MusicModelAdapter extends TypeAdapter<MusicModel> {
   @override
   void write(BinaryWriter writer, MusicModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -46,7 +46,11 @@ class MusicModelAdapter extends TypeAdapter<MusicModel> {
       ..writeByte(5)
       ..write(obj.data)
       ..writeByte(6)
-      ..write(obj.album);
+      ..write(obj.album)
+      ..writeByte(7)
+      ..write(obj.recentNo)
+      ..writeByte(8)
+      ..write(obj.favoriteNo);
   }
 
   @override

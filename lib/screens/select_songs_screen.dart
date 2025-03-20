@@ -4,9 +4,9 @@ import 'package:on_audio_query/on_audio_query.dart';
 import '../db_functions/music_model.dart';
 
 class SelectSongsScreen extends StatefulWidget {
-  final List<MusicModel> playlistSongs;
+  final MyPlaylistModel playlist;
 
-  const SelectSongsScreen({super.key, required this.playlistSongs});
+  const SelectSongsScreen({super.key, required this.playlist});
 
   @override
   SelectSongsScreenState createState() => SelectSongsScreenState();
@@ -27,7 +27,8 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
 
     setState(() {
       _allSongs = fetchedSongs;
-      _selectedSongs = List.from(widget.playlistSongs);
+      _selectedSongs =
+          HiveDatabase.getAllMusicFromPlaylist(widget.playlist.playlistId);
     });
   }
 
@@ -44,7 +45,13 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
-            onPressed: () {
+            onPressed: () async {
+              final updatedPlaylist = MyPlaylistModel(
+                playlistId: widget.playlist.playlistId,
+                name: widget.playlist.name,
+                songs: _selectedSongs,
+              );
+              await HiveDatabase.updatePlaylist(updatedPlaylist);
               Navigator.pop(context, _selectedSongs);
             },
           ),
@@ -62,7 +69,8 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
               itemCount: _allSongs.length,
               itemBuilder: (context, index) {
                 final song = _allSongs[index];
-                bool isSelected = _selectedSongs.any((s) => s.id == song.id);
+                bool isSelected =
+                    _selectedSongs.any((s) => s.id == song.id) ? true : false;
 
                 return ListTile(
                   leading: ClipRRect(
@@ -103,7 +111,7 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
                         if (value == true) {
                           _selectedSongs.add(song);
                         } else {
-                          _selectedSongs.remove(song);
+                          _selectedSongs.removeWhere((s) => s.id == song.id);
                         }
                       });
                     },
@@ -113,7 +121,7 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
                       if (isSelected) {
                         _selectedSongs.remove(song);
                       } else {
-                        _selectedSongs.add(song);
+                        _selectedSongs.removeWhere((s) => s.id == song.id);
                       }
                     });
                   },

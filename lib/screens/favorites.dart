@@ -82,9 +82,6 @@ class FavoritesState extends State<Favorites> {
                                     _filteredFavorites.removeWhere(
                                         (item) => item.id == song.id);
                                   });
-
-                                  Favorites.refreshNotifier.value =
-                                      !Favorites.refreshNotifier.value;
                                 },
                               ),
                             );

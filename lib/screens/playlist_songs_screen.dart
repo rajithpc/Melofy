@@ -3,10 +3,10 @@ import 'package:melofy/db_functions/music_model.dart';
 import 'package:melofy/screens/now_playing_screen.dart';
 import 'package:melofy/screens/playlist.dart';
 import 'package:melofy/widgets/common_list_item.dart';
-import 'package:melofy/widgets/mini_player.dart';
 import '../db_functions/db_crud_functions.dart';
 import '../widgets/delete_confirmation.dart';
 import '../widgets/search.dart';
+import '../widgets/snackbar_message.dart';
 import 'select_songs_screen.dart';
 
 class PlaylistSongsScreen extends StatefulWidget {
@@ -55,42 +55,35 @@ class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.grey[900],
         foregroundColor: Colors.grey,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Playlist(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: Text(widget.playlist.name),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
-              List<MusicModel> selectedSongs = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SelectSongsScreen(
-                    playlistSongs: _songs,
-                  ),
+                  builder: (context) =>
+                      SelectSongsScreen(playlist: widget.playlist),
                 ),
               );
-
-              HiveDatabase.removeMultipleSongsFromPlaylist(
-                  widget.playlist.playlistId, _songs);
-
-              if (selectedSongs.isNotEmpty) {
-                HiveDatabase.addMultipleSongsToPlaylist(
-                    widget.playlist.playlistId, selectedSongs);
-              }
-
-              fetchSongs();
+              setState(() {
+                fetchSongs();
+              });
             },
           ),
         ],
-        leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Playlist(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.arrow_back)),
       ),
       backgroundColor: Colors.grey[900],
       body: Column(
@@ -119,11 +112,13 @@ class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                             showDialog(
                               context: context,
                               builder: (context) => DeleteConfirmationDialog(
-                                title: "Remove from playlist",
-                                content: "Are you sure you want to remove ?",
+                                title: "Delete Playlist",
+                                content: "Are you sure you want to delete ?",
                                 onConfirm: () {
                                   HiveDatabase.removeMusicFromPlaylist(
                                       widget.playlist.playlistId, song);
+                                  SnackbarMessage.showSnackbar(context,
+                                      'Song removed from ${widget.playlist.name}');
                                   setState(() {
                                     _songs.removeWhere(
                                         (item) => item.id == song.id);
@@ -140,7 +135,7 @@ class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
                               MaterialPageRoute(
                                 builder: (context) => NowPlayingScreen(
                                   songs: _songs,
-                                  currentIndex: _songs.indexOf(song),
+                                  currentIndex: index,
                                 ),
                               ),
                             );
@@ -151,7 +146,6 @@ class PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const MiniPlayer(),
     );
   }
 }

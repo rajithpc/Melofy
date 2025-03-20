@@ -20,9 +20,10 @@ class Search extends StatelessWidget {
           filled: true,
           fillColor: Colors.grey[800],
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide.none,
           ),
+          contentPadding: const EdgeInsets.all(0),
         ),
       ),
     );

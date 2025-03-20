@@ -6,6 +6,7 @@ import '../db_functions/db_crud_functions.dart';
 import '../widgets/delete_confirmation.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/screen_navigators.dart';
+import '../widgets/snackbar_message.dart';
 import 'now_playing_screen.dart';
 
 class MostlyPlayed extends StatefulWidget {
@@ -63,6 +64,8 @@ class MostlyPlayedState extends State<MostlyPlayed> {
                                         "Are you sure you want to remove ?",
                                     onConfirm: () {
                                       HiveDatabase.removeFromMostlyPlayed(song);
+                                      SnackbarMessage.showSnackbar(context,
+                                          'Song removed from mostly played');
                                       setState(() {
                                         _mostlyPlayedSongs.removeWhere(
                                             (item) => item.id == song.id);
