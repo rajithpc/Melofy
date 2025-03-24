@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:melofy/widgets/snackbar_message.dart';
 import 'package:path_provider/path_provider.dart';
 import 'music_model.dart';
 
@@ -8,6 +9,7 @@ class HiveDatabase {
   static const String _favoritesBox = 'favoritesBox';
   static const String _mostlyPlayedBox = 'mostlyPlayedBox';
   static const String _playlistsBox = 'playlistsBox';
+  static const String _nowPlayingBox = 'nowPlayingBox';
 
   static Future<void> initHive() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -19,6 +21,7 @@ class HiveDatabase {
     await Hive.openBox<MusicModel>(_favoritesBox);
     await Hive.openBox<MusicModel>(_mostlyPlayedBox);
     await Hive.openBox<MyPlaylistModel>(_playlistsBox);
+    await Hive.openBox<MyPlaylistModel>(_nowPlayingBox);
   }
 
   // static Future<void> addMusic(String boxName, MusicModel music) async {
@@ -50,12 +53,16 @@ class HiveDatabase {
     await box.delete(id);
   }
 
-  static Future<void> addPlaylist(String playlistName) async {
+  static Future<void> addPlaylist(String playlistName, dynamic context) async {
     final box = Hive.box<MyPlaylistModel>(_playlistsBox);
 
     bool alreadyExists =
         box.values.any((playlist) => playlist.name == playlistName);
-    if (alreadyExists) return;
+
+    if (alreadyExists) {
+      SnackbarMessage.showSnackbar(context, 'Playlist already exist');
+      return;
+    }
 
     int generateUniqueId() {
       final box = Hive.box<MyPlaylistModel>(_playlistsBox);
@@ -84,8 +91,17 @@ class HiveDatabase {
     return box.get(playlistId);
   }
 
-  static Future<void> updatePlaylist(MyPlaylistModel playlist) async {
+  static Future<void> updatePlaylist(
+      MyPlaylistModel playlist, dynamic context) async {
     final box = Hive.box<MyPlaylistModel>(_playlistsBox);
+    bool alreadyExists = box.values.any((playlistItem) =>
+        playlistItem.name == playlist.name &&
+        playlist.playlistId != playlistItem.playlistId);
+
+    if (alreadyExists) {
+      SnackbarMessage.showSnackbar(context, 'Playlist already exist');
+      return;
+    }
     if (box.containsKey(playlist.playlistId)) {
       await box.put(playlist.playlistId, playlist);
     }
@@ -314,5 +330,26 @@ class HiveDatabase {
     final box = Hive.box<MusicModel>(_mostlyPlayedBox);
 
     await box.delete(music.id);
+  }
+
+  static Future<void> addToNowPlaying(List<MusicModel> songs) async {
+    final box = Hive.box<MyPlaylistModel>(_nowPlayingBox);
+
+    MyPlaylistModel newNowPlaying = MyPlaylistModel(
+      playlistId: 1,
+      name: 'Now Playing',
+      songs: songs,
+    );
+
+    await box.put(newNowPlaying.playlistId, newNowPlaying);
+  }
+
+  static List<MusicModel> getAllNowPlaying() {
+    final nowPlayingBox = Hive.box<MyPlaylistModel>(_nowPlayingBox);
+    final nowPlaying = nowPlayingBox.get(1);
+
+    if (nowPlaying == null) return [];
+
+    return nowPlaying.songs;
   }
 }

@@ -78,6 +78,7 @@ class RecentState extends State<Recent> {
                                 );
                               },
                               onTap: () {
+                                FocusScope.of(context).unfocus();
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

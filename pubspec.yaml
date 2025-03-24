@@ -54,7 +54,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/melofy_logo.png"
+  image_path: "assets/icon/melofy_logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -86,7 +86,7 @@ flutter:
     - assets/images/favorites.png
     - assets/images/mostly.png
     - assets/images/emptyImage.jpg
-    - assets/icons/melofy_logo.jpg
+    - assets/icon/melofy_logo.png
 
 
 

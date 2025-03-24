@@ -19,7 +19,7 @@ class AddPlaylistState extends State<AddPlaylist> {
   void _createPlaylist() {
     if (_formKey.currentState!.validate()) {
       String playlistName = _playlistController.text.trim();
-      HiveDatabase.addPlaylist(playlistName);
+      HiveDatabase.addPlaylist(playlistName, context);
       widget.onClose();
     }
   }
@@ -31,7 +31,7 @@ class AddPlaylistState extends State<AddPlaylist> {
         playlistId: widget.playlist!.playlistId,
         songs: widget.playlist!.songs,
       );
-      HiveDatabase.updatePlaylist(tempPlaylist);
+      HiveDatabase.updatePlaylist(tempPlaylist, context);
       widget.onClose();
     }
   }

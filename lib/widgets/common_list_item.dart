@@ -73,7 +73,10 @@ class CommonListItem extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-        onTap: onTap,
+        onTap: () {
+          FocusScope.of(context).unfocus();
+          onTap();
+        },
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(70, 0, 20, 0),

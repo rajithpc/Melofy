@@ -181,14 +181,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                                 HiveDatabase.addToFavorites(widget.song);
                                 SnackbarMessage.showSnackbar(
                                     context, 'Song added to favorites');
+
+                                // setState(() {
+                                //   getFavorites();
+                                FavoriteWidget.refreshNotifier.value =
+                                    !FavoriteWidget.refreshNotifier.value;
+                                Favorites.refreshNotifier.value =
+                                    !Favorites.refreshNotifier.value;
+                                //});
                                 Navigator.pop(context);
-                                setState(() {
-                                  getFavorites();
-                                  FavoriteWidget.refreshNotifier.value =
-                                      !FavoriteWidget.refreshNotifier.value;
-                                  Favorites.refreshNotifier.value =
-                                      !Favorites.refreshNotifier.value;
-                                });
                               },
                               child: const Padding(
                                 padding: EdgeInsets.fromLTRB(20, 0, 0, 0),

@@ -3,6 +3,7 @@ import 'package:melofy/screens/all_songs.dart';
 import 'package:melofy/screens/mostly_played.dart';
 import 'package:melofy/screens/playlist.dart';
 import 'package:melofy/screens/recent.dart';
+import 'package:melofy/widgets/navigation_item.dart';
 import '../screens/favorites.dart';
 
 class ScreenNavigators extends StatelessWidget {
@@ -19,65 +20,65 @@ class ScreenNavigators extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              if (screenName != "All Songs")
-                _buildNavItem(
-                  context,
-                  'assets/images/all_songs.png',
-                  'All Songs',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AllSongsScreen()),
-                  ),
-                ),
-              if (screenName != "Recent")
-                _buildNavItem(
-                  context,
-                  'assets/images/recent.png',
-                  'Recent',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Recent()),
-                  ),
-                ),
-              if (screenName != "Favorites")
-                _buildNavItem(
-                  context,
-                  'assets/images/favorites.png',
-                  'Favorites',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Favorites()),
-                  ),
-                ),
-              if (screenName != "Playlist")
-                _buildNavItem(
-                  context,
-                  'assets/images/playlist.png',
-                  'Playlist',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Playlist()),
-                  ),
-                ),
-              if (screenName != "Mostly played songs")
-                _buildNavItem(
-                  context,
-                  'assets/images/mostly.png',
-                  'Mostly played',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MostlyPlayed()),
-                  ),
-                ),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (screenName != "All Songs")
+              NavigationItem(
+                  icon: Icons.my_library_music_rounded,
+                  onTap: () => Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AllSongsScreen()),
+                        (Route<dynamic> route) => false,
+                      ),
+                  title: 'All Songs',
+                  boxColor: Colors.blueAccent),
+            if (screenName != "Recent")
+              NavigationItem(
+                  icon: Icons.av_timer_rounded,
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Recent(),
+                        ),
+                      ),
+                  title: "Recent",
+                  boxColor: Colors.orangeAccent),
+            if (screenName != "Favorites")
+              NavigationItem(
+                  icon: Icons.favorite_rounded,
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Favorites(),
+                        ),
+                      ),
+                  title: 'Favorites',
+                  boxColor: Colors.purpleAccent),
+            if (screenName != "Playlist")
+              NavigationItem(
+                  icon: Icons.library_music_outlined,
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Playlist(),
+                        ),
+                      ),
+                  title: "Playlist",
+                  boxColor: Colors.greenAccent),
+            if (screenName != "Mostly played songs")
+              NavigationItem(
+                  icon: Icons.star_border_purple500,
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MostlyPlayed(),
+                        ),
+                      ),
+                  title: "Most played",
+                  boxColor: Colors.black),
+          ],
         ),
         Container(
           margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -87,9 +88,9 @@ class ScreenNavigators extends StatelessWidget {
               Text(
                 screenName,
                 style: const TextStyle(
-                  color: Colors.grey,
+                  color: Colors.white,
                   fontFamily: 'melofy-font',
-                  fontSize: 25,
+                  fontSize: 20,
                 ),
               ),
               if (screenName == "Playlist")
@@ -104,26 +105,26 @@ class ScreenNavigators extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(
-      BuildContext context, String iconPath, String title, VoidCallback onTap) {
-    return SizedBox(
-      width: 200,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Image.asset(iconPath, width: 40, height: 40),
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'melofy-font',
-                fontSize: 20,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildNavItem(
+  //     BuildContext context, String iconPath, String title, VoidCallback onTap) {
+  //   return SizedBox(
+  //     width: 200,
+  //     child: GestureDetector(
+  //       onTap: onTap,
+  //       child: Column(
+  //         children: [
+  //           Image.asset(iconPath, width: 40, height: 40),
+  //           Text(
+  //             title,
+  //             style: const TextStyle
+  //               fontFamily: 'melofy-font',
+  //               fontSize: 20,
+  //               color: Colors.grey,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

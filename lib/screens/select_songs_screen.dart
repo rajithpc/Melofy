@@ -51,7 +51,7 @@ class SelectSongsScreenState extends State<SelectSongsScreen> {
                 name: widget.playlist.name,
                 songs: _selectedSongs,
               );
-              await HiveDatabase.updatePlaylist(updatedPlaylist);
+              await HiveDatabase.updatePlaylist(updatedPlaylist, context);
               Navigator.pop(context, _selectedSongs);
             },
           ),

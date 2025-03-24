@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:melofy/db_functions/db_crud_functions.dart';
 import 'package:melofy/widgets/common_list_item.dart';
 import '../db_functions/music_model.dart';
 import '../services/playback_controls.dart';
@@ -23,15 +24,23 @@ class NowPlayingScreen extends StatefulWidget {
 class NowPlayingScreenState extends State<NowPlayingScreen> {
   bool isAddToDB = true;
   final nowPlayingController = NowPlayingController();
+  late List<MusicModel> songs;
 
   @override
   void initState() {
     super.initState();
+    HiveDatabase.addToNowPlaying(widget.songs);
+    songs = getAllSongs();
     initController();
   }
 
+  List<MusicModel> getAllSongs() {
+    List<MusicModel> songs = HiveDatabase.getAllNowPlaying();
+    return songs;
+  }
+
   void initController() {
-    nowPlayingController.initialize(widget.songs, widget.currentIndex, () {
+    nowPlayingController.initialize(songs, widget.currentIndex, () {
       setState(() {});
     });
   }
